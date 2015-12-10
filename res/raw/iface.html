@@ -1,0 +1,69 @@
+<html>
+<head>
+<title>SMS server interface</title>
+<style>
+td {
+	padding: 5pt;
+}
+body {
+	background: rgb(71,150,207);
+}
+#form_area {
+	background: rgb(183,181,96);
+	border: medium solid #000;	
+}
+#outer_table {
+	position: relative;
+	top: -50px;
+}
+#message_texta {
+	vertical-align: top;
+}
+#dir_btn {
+	visibility: hidden;
+}
+input {
+	vertical-align: middle;
+}
+</style>
+<script>
+function change_dir(btn) {
+	ta=document.getElementById('message_texta');
+	dir=ta.dir;
+	if(dir=='ltr') {
+		ta.dir='rtl';
+		btn.innerHTML='LTR';
+	}
+	else {
+		ta.dir='ltr';
+		btn.innerHTML='RTL';
+	}
+}
+
+function loaded() {
+	document.getElementById('dir_btn').style.visibility='visible';
+}
+
+</script>
+</head>
+<body onload='loaded()'>
+<table width='100%' height='100%' id=outer_table><tr><td align=center valign=center>
+<h3 align=center>SMS server interface</h3>
+<form action='' method=post>
+<table id=form_area>
+<tr><td>Number: <input name=number type=text></td></tr>
+<tr><td valign=top>
+<table cellpadding=0 cellspacing=0>
+<tr valign=top align=center><td rowspan=2 style='padding: 0px; padding-top: 5px'>Message:<br><br><button id=dir_btn onclick='change_dir(this); return false;'>RTL</button></td></tr>
+<tr valign=top align=center><td><textarea name=message rows=5 id=message_texta dir=ltr></textarea></td></tr>
+</table>
+</td></tr>
+<tr><td align=center>
+Via device built-in SMS app:<input type=checkbox name=via_builtin_app value='yes'>
+<input type=submit value=Send>
+</td></tr>
+</table>
+</form>
+</td></tr></table>
+</body>
+</html>
