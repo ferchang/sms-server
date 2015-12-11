@@ -56,8 +56,8 @@ public class main extends Activity
 
 				AsyncHttpRequestBody rb=request.getBody();
 				Multimap vars=(Multimap) rb.get();
-				
-				if(vars.getString("via_builtin_app")=="yes") {
+			
+				if(!"yes".equals(vars.getString("via_builtin_app"))) {
 					SmsManager smsManager = SmsManager.getDefault();
 					smsManager.sendTextMessage(vars.getString("number"), null, vars.getString("message"), null, null);
 				}
@@ -69,11 +69,7 @@ public class main extends Activity
 					startActivity(sendIntent);
 				}
 				
-				response.send(
-				" Number: "+vars.getString("number")
-				+"<br>Message: "+vars.getString("message")
-				+"<br>via_builtin_app: "+vars.getString("via_builtin_app")
-				);
+				response.send(getRawResourceStr(R.raw.ok));
             }
         });
 		
@@ -82,12 +78,7 @@ public class main extends Activity
 		server.get("/", new HttpServerRequestCallback() {
             @Override
             public void onRequest(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
-				try {
-					InputStream is=getResources().openRawResource(R.raw.iface);
-					byte[] reader = new byte[is.available()];
-					while(is.read(reader) != -1) {}
-					response.send(new String(reader));
-				} catch (IOException e) {}
+				response.send(getRawResourceStr(R.raw.iface));
             }
         });
 		
@@ -95,5 +86,16 @@ public class main extends Activity
 		
         server.listen(mAsyncServer, 8888);
     }
+	
+	private String getRawResourceStr(int rid) {
+			String s="";
+		try {
+				InputStream is=getResources().openRawResource(rid);
+				byte[] reader = new byte[is.available()];
+				while(is.read(reader) != -1) {}
+				s=new String(reader);
+			} catch (IOException e) {}
+			return s;
+	}
 	
 }
