@@ -5,6 +5,7 @@ import android.telephony.SmsManager;
 import java.io.InputStream;
 import java.io.IOException; 
 
+import android.util.Log;
 import android.content.Intent;
 
 import android.app.Activity;
@@ -19,6 +20,7 @@ import com.koushikdutta.async.http.server.AsyncHttpServerResponse;
 import com.koushikdutta.async.http.server.HttpServerRequestCallback;
 import com.koushikdutta.async.http.body.AsyncHttpRequestBody;
 import com.koushikdutta.async.http.Multimap;
+import com.koushikdutta.async.http.Headers;
 
 public class main extends Activity
 {
@@ -44,6 +46,7 @@ public class main extends Activity
     public void onResume() {
         super.onResume();
         startServer();
+		Log.d("sms_server", "#############################");
     }
 	
 	 private void startServer() {
@@ -56,7 +59,10 @@ public class main extends Activity
 
 				AsyncHttpRequestBody rb=request.getBody();
 				Multimap vars=(Multimap) rb.get();
-			
+				
+				String host=request.getHeaders().get("host");
+				Log.d("sms_server", host);
+				
 				if(!"yes".equals(vars.getString("via_builtin_app"))) {
 					SmsManager smsManager = SmsManager.getDefault();
 					smsManager.sendTextMessage(vars.getString("number"), null, vars.getString("message"), null, null);
@@ -69,7 +75,7 @@ public class main extends Activity
 					startActivity(sendIntent);
 				}
 				
-				response.send(getRawResourceStr(R.raw.ok));
+				response.send(getRawResourceStr(R.raw.ok).replace("%%host%%", host));
             }
         });
 		
@@ -78,6 +84,7 @@ public class main extends Activity
 		server.get("/", new HttpServerRequestCallback() {
             @Override
             public void onRequest(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
+				Log.d("sms_server", "get");
 				response.send(getRawResourceStr(R.raw.iface));
             }
         });
