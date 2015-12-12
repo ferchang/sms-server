@@ -2,6 +2,10 @@ package com.sms;
 
 import android.telephony.SmsManager;
 
+import android.net.Uri;
+
+import android.content.ContentValues;
+
 import java.io.InputStream;
 import java.io.IOException; 
 
@@ -61,13 +65,22 @@ public class main extends Activity
 				Multimap vars=(Multimap) rb.get();
 				
 				String host=request.getHeaders().get("host");
-				Log.d("sms_server", host);
-				
+								
 				if(!"yes".equals(vars.getString("via_builtin_app"))) {
+					
+					//--------------------------
+					ContentValues values = new ContentValues();
+					values.put("address", "+989121111111");
+					values.put("body", "foo bar");
+					getContentResolver().insert(Uri.parse("content://sms/sent"), values);
+					//--------------------------
+					
 					SmsManager smsManager = SmsManager.getDefault();
-					smsManager.sendTextMessage(vars.getString("number"), null, vars.getString("message"), null, null);
+					//smsManager.sendTextMessage(vars.getString("number"), null, vars.getString("message"), null, null);
+					
 				}
 				else {
+				
 					Intent sendIntent = new Intent(Intent.ACTION_VIEW);
 					sendIntent.putExtra("sms_body", vars.getString("message")); 
 					sendIntent.setType("vnd.android-dir/mms-sms");
