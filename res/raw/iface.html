@@ -25,6 +25,14 @@ body {
 input {
 	vertical-align: middle;
 }
+#div1 {
+	float: left;
+	text-align: right;
+}
+#submit_btn {
+	margin-top: 10px;
+	margin-left: 10px;
+}
 </style>
 <script>
 function change_dir(btn) {
@@ -59,8 +67,11 @@ function loaded() {
 </table>
 </td></tr>
 <tr><td align=center>
-Via device built-in SMS app:<input type=checkbox name=via_builtin_app value=yes >
-<input type=submit value=Send>
+<div id=div1>
+Via device built-in SMS app:<input type=checkbox name=via_builtin_app value=yes>
+<br>Save copy in sent box:<input type=checkbox name=save_copy value=yes checked>
+</div>
+<input type=submit value=Send id=submit_btn>
 </td></tr>
 </table>
 </form>

@@ -66,26 +66,25 @@ public class main extends Activity
 				
 				String host=request.getHeaders().get("host");
 								
-				if(!"yes".equals(vars.getString("via_builtin_app"))) {
+				if(vars.getString("via_builtin_app")==null) {
 					
-					//--------------------------
-					ContentValues values = new ContentValues();
-					values.put("address", "+989121111111");
-					values.put("body", "foo bar");
-					getContentResolver().insert(Uri.parse("content://sms/sent"), values);
-					//--------------------------
-					
+					if(vars.getString("save_copy")!=null) {
+						ContentValues values = new ContentValues();
+						values.put("address", vars.getString("number"));
+						values.put("body", vars.getString("message"));
+						getContentResolver().insert(Uri.parse("content://sms/sent"), values);
+					}
+
 					SmsManager smsManager = SmsManager.getDefault();
 					//smsManager.sendTextMessage(vars.getString("number"), null, vars.getString("message"), null, null);
 					
 				}
 				else {
-				
 					Intent sendIntent = new Intent(Intent.ACTION_VIEW);
 					sendIntent.putExtra("sms_body", vars.getString("message")); 
 					sendIntent.setType("vnd.android-dir/mms-sms");
 					sendIntent.putExtra("address"  , new String (vars.getString("number")));
-					startActivity(sendIntent);
+					//startActivity(sendIntent);
 				}
 				
 				response.send(getRawResourceStr(R.raw.ok).replace("%%host%%", host));
