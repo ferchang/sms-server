@@ -25,13 +25,15 @@ body {
 input {
 	vertical-align: middle;
 }
+select {
+	vertical-align: middle;
+}
 #div1 {
 	float: left;
 	text-align: right;
 }
 #submit_btn {
-	margin-top: 3px;
-	margin-left: 10px;
+
 }
 </style>
 <script>
@@ -69,14 +71,16 @@ function via_builtin_app_click(obj) {
 <tr><td valign=top>
 <table cellpadding=0 cellspacing=0>
 <tr valign=top align=center><td rowspan=2 style='padding: 0px; padding-top: 5px'>Message:<br><br><button id=dir_btn onclick='change_dir(this); return false;'>RTL</button></td></tr>
-<tr valign=top align=center><td><textarea name=message rows=5 id=message_texta dir=ltr></textarea></td></tr>
+<tr valign=top align=center><td><textarea name=message cols=25 rows=5 id=message_texta dir=ltr></textarea></td></tr>
 </table>
 </td></tr>
 <tr><td align=center>
-<div id=div1>
-Via device built-in SMS app:<input type=checkbox name=via_builtin_app value=yes onclick='via_builtin_app_click(this);'>
-<br><span id=save_copy_id>Save copy in sent box:<input type=checkbox name=save_copy value=yes checked></span>
-</div>
+<select name=action>
+<option value=direct>Send message directly
+<option value=direct8save>Send message directly and save it
+<option value=builtin>Send to device built-in SMS app
+<option value=copy>Just copy message to device clipboard
+</select>
 <input type=submit value=Send id=submit_btn>
 </td></tr>
 </table>
