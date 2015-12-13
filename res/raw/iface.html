@@ -30,7 +30,7 @@ input {
 	text-align: right;
 }
 #submit_btn {
-	margin-top: 10px;
+	margin-top: 3px;
 	margin-left: 10px;
 }
 </style>
@@ -52,6 +52,12 @@ function loaded() {
 	document.getElementById('dir_btn').style.visibility='visible';
 }
 
+function via_builtin_app_click(obj) {
+	t=document.getElementById('save_copy_id');
+	if(obj.checked) t.style.display='none';
+	else t.style.display='';
+}
+
 </script>
 </head>
 <body onload='loaded()'>
@@ -68,8 +74,8 @@ function loaded() {
 </td></tr>
 <tr><td align=center>
 <div id=div1>
-Via device built-in SMS app:<input type=checkbox name=via_builtin_app value=yes>
-<br>Save copy in sent box:<input type=checkbox name=save_copy value=yes checked>
+Via device built-in SMS app:<input type=checkbox name=via_builtin_app value=yes onclick='via_builtin_app_click(this);'>
+<br><span id=save_copy_id>Save copy in sent box:<input type=checkbox name=save_copy value=yes checked></span>
 </div>
 <input type=submit value=Send id=submit_btn>
 </td></tr>
