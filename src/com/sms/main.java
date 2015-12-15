@@ -29,7 +29,7 @@ import com.koushikdutta.async.http.Headers;
 public class main extends Activity
 {
 	
-	public enum actions { direct, direct8save, builtin, copy }
+	public enum actions { DIRECT, DIRECT8SAVE, BUILTIN, COPY }
 	
 	private AsyncHttpServer server = new AsyncHttpServer();
     private AsyncServer mAsyncServer = new AsyncServer();
@@ -68,23 +68,23 @@ public class main extends Activity
 				
 				String host=request.getHeaders().get("host");
 				
-				actions action=actions.valueOf(vars.getString("action"));
+				actions action=actions.valueOf(vars.getString("action").toUpperCase());
 			
 				switch(action) {
-					case direct:
-					case direct8save:
+					case DIRECT:
+					case DIRECT8SAVE:
 						Log.d("sms_server", "enum direct/direct8save");
-						if(true) return;
+						//if(true) return;
 						SmsManager smsManager = SmsManager.getDefault();
 						smsManager.sendTextMessage(vars.getString("number"), null, vars.getString("message"), null, null);
-						if(action==actions.direct8save) {
+						if(action==actions.DIRECT8SAVE) {
 							ContentValues values = new ContentValues();
 							values.put("address", vars.getString("number"));
 							values.put("body", vars.getString("message"));
 							getContentResolver().insert(Uri.parse("content://sms/sent"), values);
 						}
 					break;
-					case builtin:
+					case BUILTIN:
 						Log.d("sms_server", "enum builtin");
 						Intent sendIntent = new Intent(Intent.ACTION_VIEW);
 						sendIntent.putExtra("sms_body", vars.getString("message")); 
@@ -92,7 +92,7 @@ public class main extends Activity
 						sendIntent.putExtra("address"  , new String (vars.getString("number")));
 						startActivity(sendIntent);
 					break;
-					case copy:
+					case COPY:
 						Log.d("sms_server", "enum copy");
 					break;
 				}
