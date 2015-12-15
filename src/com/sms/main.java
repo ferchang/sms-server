@@ -35,7 +35,7 @@ public class main extends Activity
 	
 	private ClipboardManager clipboard;
 	
-	public enum Actions { DIRECT, DIRECT8SAVE, BUILTIN, COPY }
+	private enum Actions { DIRECT, DIRECT8SAVE, BUILTIN, COPY }
 	
 	private AsyncHttpServer server = new AsyncHttpServer();
     private AsyncServer mAsyncServer = new AsyncServer();
@@ -45,19 +45,49 @@ public class main extends Activity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-				
+		Log.d("sms_server", "-------------");
+		Log.d("sms_server", "create");		
     }
 	
-		
-	//--------------------------
+	@Override
+    public void onStart() {
+        super.onStart();
+		Log.d("sms_server", "start");
+    }
 	
 	@Override
     public void onResume() {
         super.onResume();
         startServer();
-		Log.d("sms_server", "#############");
+		Log.d("sms_server", "resume");
     }
 	
+	@Override
+   protected void onPause() {
+      super.onPause();
+      Log.d("sms_server", "pause");
+   }
+   
+   @Override
+   protected void onStop() {
+      super.onStop();
+      Log.d("sms_server", "stop");
+   }
+
+	 @Override
+   public void onDestroy() {
+	   server.stop();
+	   mAsyncServer.stop();
+      super.onDestroy();
+      Log.d("sms_server", "destroy");
+   }
+   
+   @Override
+   protected void onRestart() {
+      super.onRestart();
+      Log.d("sms_server", "restart");
+   }
+   
 	 private void startServer() {
 		 
 		 //---------------------------------------------
