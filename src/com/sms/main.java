@@ -29,6 +29,8 @@ import com.koushikdutta.async.http.Headers;
 public class main extends Activity
 {
 	
+	public enum actions { direct, direct8save, builtin, copy }
+	
 	private AsyncHttpServer server = new AsyncHttpServer();
     private AsyncServer mAsyncServer = new AsyncServer();
 	
@@ -65,28 +67,36 @@ public class main extends Activity
 				Multimap vars=(Multimap) rb.get();
 				
 				String host=request.getHeaders().get("host");
-								
-				if(vars.getString("via_builtin_app")==null) {
-					
-					if(vars.getString("save_copy")!=null) {
-						ContentValues values = new ContentValues();
-						values.put("address", vars.getString("number"));
-						values.put("body", vars.getString("message"));
-						getContentResolver().insert(Uri.parse("content://sms/sent"), values);
-					}
-
-					SmsManager smsManager = SmsManager.getDefault();
-					//smsManager.sendTextMessage(vars.getString("number"), null, vars.getString("message"), null, null);
-					
-				}
-				else {
-					Intent sendIntent = new Intent(Intent.ACTION_VIEW);
-					sendIntent.putExtra("sms_body", vars.getString("message")); 
-					sendIntent.setType("vnd.android-dir/mms-sms");
-					sendIntent.putExtra("address"  , new String (vars.getString("number")));
-					//startActivity(sendIntent);
-				}
 				
+				actions action=actions.valueOf(vars.getString("action"));
+			
+				switch(action) {
+					case direct:
+					case direct8save:
+						Log.d("sms_server", "enum direct/direct8save");
+						if(true) return;
+						SmsManager smsManager = SmsManager.getDefault();
+						smsManager.sendTextMessage(vars.getString("number"), null, vars.getString("message"), null, null);
+						if(action==actions.direct8save) {
+							ContentValues values = new ContentValues();
+							values.put("address", vars.getString("number"));
+							values.put("body", vars.getString("message"));
+							getContentResolver().insert(Uri.parse("content://sms/sent"), values);
+						}
+					break;
+					case builtin:
+						Log.d("sms_server", "enum builtin");
+						Intent sendIntent = new Intent(Intent.ACTION_VIEW);
+						sendIntent.putExtra("sms_body", vars.getString("message")); 
+						sendIntent.setType("vnd.android-dir/mms-sms");
+						sendIntent.putExtra("address"  , new String (vars.getString("number")));
+						startActivity(sendIntent);
+					break;
+					case copy:
+						Log.d("sms_server", "enum copy");
+					break;
+				}
+			
 				response.send(getRawResourceStr(R.raw.ok).replace("%%host%%", host));
             }
         });
