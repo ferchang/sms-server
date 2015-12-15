@@ -4,6 +4,10 @@ import android.telephony.SmsManager;
 
 import android.net.Uri;
 
+import android.content.ClipboardManager;
+import android.content.ClipData;
+import android.content.Context;
+
 import android.content.ContentValues;
 
 import java.io.InputStream;
@@ -29,14 +33,13 @@ import com.koushikdutta.async.http.Headers;
 public class main extends Activity
 {
 	
-	public enum actions { DIRECT, DIRECT8SAVE, BUILTIN, COPY }
+	private ClipboardManager clipboard;
+	
+	public enum Actions { DIRECT, DIRECT8SAVE, BUILTIN, COPY }
 	
 	private AsyncHttpServer server = new AsyncHttpServer();
     private AsyncServer mAsyncServer = new AsyncServer();
 	
-	Button btn;
-	
-    /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -52,7 +55,7 @@ public class main extends Activity
     public void onResume() {
         super.onResume();
         startServer();
-		Log.d("sms_server", "#############################");
+		Log.d("sms_server", "#############");
     }
 	
 	 private void startServer() {
@@ -68,7 +71,7 @@ public class main extends Activity
 				
 				String host=request.getHeaders().get("host");
 				
-				actions action=actions.valueOf(vars.getString("action").toUpperCase());
+				Actions action=Actions.valueOf(vars.getString("action").toUpperCase());
 			
 				switch(action) {
 					case DIRECT:
@@ -77,7 +80,7 @@ public class main extends Activity
 						//if(true) return;
 						SmsManager smsManager = SmsManager.getDefault();
 						smsManager.sendTextMessage(vars.getString("number"), null, vars.getString("message"), null, null);
-						if(action==actions.DIRECT8SAVE) {
+						if(action==Actions.DIRECT8SAVE) {
 							ContentValues values = new ContentValues();
 							values.put("address", vars.getString("number"));
 							values.put("body", vars.getString("message"));
@@ -94,6 +97,15 @@ public class main extends Activity
 					break;
 					case COPY:
 						Log.d("sms_server", "enum copy");
+						final String fmessage=vars.getString("message");
+						runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+								ClipData clip = ClipData.newPlainText("message", fmessage);
+								clipboard.setPrimaryClip(clip);
+							}
+						});
 					break;
 				}
 			
