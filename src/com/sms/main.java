@@ -1,5 +1,13 @@
 package com.sms;
 
+//----------------
+import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+//----------------
+
 import android.telephony.SmsManager;
 
 import android.net.Uri;
@@ -32,6 +40,8 @@ import com.koushikdutta.async.http.Headers;
 
 public class main extends Activity
 {
+	
+	public static final int EDIT_ID = Menu.FIRST;
 	
 	private ClipboardManager clipboard;
 	
@@ -168,5 +178,23 @@ public class main extends Activity
 			} catch (IOException e) {}
 			return s;
 	}
+	
+	//------------------------------
+	public boolean onCreateOptionsMenu(Menu menu) {
+		menu.add(Menu.NONE, EDIT_ID, Menu.NONE, "Options").setAlphabeticShortcut('o');
+		return(super.onCreateOptionsMenu(menu));
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case EDIT_ID:
+				startActivity(new Intent(this, prefs.class));
+				return(true);
+		}
+		return(super.onOptionsItemSelected(item));
+	}
+	
+	//------------------------------
 	
 }
