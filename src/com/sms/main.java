@@ -38,7 +38,7 @@ import com.koushikdutta.async.http.body.AsyncHttpRequestBody;
 import com.koushikdutta.async.http.Multimap;
 import com.koushikdutta.async.http.Headers;
 
-public class main extends Activity
+public class Main extends Activity
 {
 	
 	public static final int EDIT_ID = Menu.FIRST;
@@ -188,7 +188,7 @@ public class main extends Activity
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case EDIT_ID:
-				startActivity(new Intent(this, prefs.class));
+				startActivity(new Intent(this, Prefs.class));
 				return(true);
 		}
 		return(super.onOptionsItemSelected(item));
