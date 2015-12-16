@@ -42,9 +42,7 @@ public class main extends Activity
 {
 	
 	public static final int EDIT_ID = Menu.FIRST;
-	
-	private ClipboardManager clipboard;
-	
+
 	private enum Actions { DIRECT, DIRECT8SAVE, BUILTIN, COPY }
 	
 	private AsyncHttpServer server = new AsyncHttpServer();
@@ -141,7 +139,7 @@ public class main extends Activity
 						runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
-								clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+								ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
 								ClipData clip = ClipData.newPlainText("message", fmessage);
 								clipboard.setPrimaryClip(clip);
 							}
@@ -181,7 +179,8 @@ public class main extends Activity
 	
 	//------------------------------
 	public boolean onCreateOptionsMenu(Menu menu) {
-		menu.add(Menu.NONE, EDIT_ID, Menu.NONE, "Options").setAlphabeticShortcut('o');
+		menu.add(Menu.NONE, EDIT_ID, Menu.NONE, "Options");
+		menu.add(Menu.NONE, EDIT_ID, Menu.NONE, "About");
 		return(super.onCreateOptionsMenu(menu));
 	}
 	
