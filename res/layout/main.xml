@@ -17,5 +17,16 @@ android:textSize="30sp"
 android:padding="30sp"
 />
 
+<TextView 
+android:id="@+id/port"
+android:text="Port: ?"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:layout_centerInParent="true"
+android:textSize="20sp"
+android:padding="20sp"
+/>
+
+
 </LinearLayout>
 

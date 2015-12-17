@@ -8,6 +8,8 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 //----------------
 
+import android.widget.TextView;
+
 import android.telephony.SmsManager;
 
 import android.net.Uri;
@@ -41,7 +43,9 @@ import com.koushikdutta.async.http.Headers;
 public class Main extends Activity
 {
 	
-	public static final int EDIT_ID = Menu.FIRST;
+	private int port;
+	
+	private static final int EDIT_ID = Menu.FIRST;
 
 	private enum Actions { DIRECT, DIRECT8SAVE, BUILTIN, COPY }
 	
@@ -66,8 +70,14 @@ public class Main extends Activity
 	@Override
     public void onResume() {
         super.onResume();
-        startServer();
 		Log.d("sms_server", "resume");
+		SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(this);
+		port=Integer.parseInt(prefs.getString("port", "8888"));
+		Log.d("sms_server", "port: "+Integer.toString(port));
+        startServer();
+		TextView portLbl = (TextView) findViewById(R.id.port);
+		portLbl.setText("Port: "+port);
+		
     }
 	
 	@Override
@@ -162,15 +172,13 @@ public class Main extends Activity
         });
 		
 		//---------------------------------------------
-		SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(this);
-		
-		String port=prefs.getString("port", "8888");
-		Log.d("sms_server", "port: "+port);
 		
 		server.stop();
 		mAsyncServer.stop();
 		
-        server.listen(mAsyncServer, Integer.parseInt(port));
+		Log.d("sms_server", "starting server...");
+		server.listen(mAsyncServer, port);
+        
     }
 	
 	private String getRawResourceStr(int rid) {

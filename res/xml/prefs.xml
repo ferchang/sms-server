@@ -2,7 +2,6 @@
 xmlns:android="http://schemas.android.com/apk/res/android">
 
    <EditTextPreference 
-    android:defaultValue="8888" 
     android:key="port" 
     android:title="Port"
 	android:inputType="numberDecimal"
