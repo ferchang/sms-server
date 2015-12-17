@@ -1,13 +1,11 @@
 <PreferenceScreen
 xmlns:android="http://schemas.android.com/apk/res/android">
-<CheckBoxPreference
-android:key="checkbox"
-android:title="Checkbox Preference"
-android:summary="Check it on, check it off" />
-<RingtonePreference
-android:key="ringtone"
-android:title="Ringtone Preference"
-android:showDefault="true"
-android:showSilent="true"
-android:summary="Pick a tone, any tone" />
+
+   <EditTextPreference 
+    android:defaultValue="8888" 
+    android:key="port" 
+    android:title="Port"
+	android:inputType="numberDecimal"
+    />    
+
 </PreferenceScreen>

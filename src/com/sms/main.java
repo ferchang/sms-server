@@ -162,8 +162,15 @@ public class Main extends Activity
         });
 		
 		//---------------------------------------------
+		SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(this);
 		
-        server.listen(mAsyncServer, 8888);
+		String port=prefs.getString("port", "8888");
+		Log.d("sms_server", "port: "+port);
+		
+		server.stop();
+		mAsyncServer.stop();
+		
+        server.listen(mAsyncServer, Integer.parseInt(port));
     }
 	
 	private String getRawResourceStr(int rid) {
