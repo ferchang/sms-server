@@ -45,6 +45,8 @@ public class Main extends Activity
 	
 	private int port;
 	
+	private final int DEFAULT_PORT=8888;
+	
 	private static final int EDIT_ID = Menu.FIRST;
 
 	private enum Actions { DIRECT, DIRECT8SAVE, BUILTIN, COPY }
@@ -72,7 +74,9 @@ public class Main extends Activity
         super.onResume();
 		Log.d("sms_server", "resume");
 		SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(this);
-		port=Integer.parseInt(prefs.getString("port", "8888"));
+		String tmp=prefs.getString("port", "");
+		if(tmp.equals("")) port=DEFAULT_PORT;
+		else port=Integer.parseInt(tmp);
 		Log.d("sms_server", "port: "+Integer.toString(port));
         startServer();
 		TextView portLbl = (TextView) findViewById(R.id.port);
