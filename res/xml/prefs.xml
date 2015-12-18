@@ -3,7 +3,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 
    <EditTextPreference 
     android:key="port" 
-    android:title="Port"
+    android:title="Port number"
 	android:inputType="numberDecimal"
     />    
 
