@@ -17,6 +17,10 @@ android:textSize="30sp"
 android:padding="30sp"
 />
 
+<View android:layout_width="50dp"
+    android:layout_height="50dp"
+    android:background="@drawable/myshape"/>
+
 <TextView 
 android:id="@+id/port"
 android:text="Port: ?"
