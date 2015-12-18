@@ -194,11 +194,11 @@ public class Main extends Activity implements CompletedCallback
 		AsyncServerSocket tmp=server.listen(mAsyncServer, port);
 		if(tmp==null) {
 			Log.d("sms_server", "server start failed");
-			findViewById(R.id.status_view).setBackgroundResource(R.drawable.server_off);
+			findViewById(R.id.status_view).setBackgroundResource(R.drawable.server_off_led);
 		}
 		else {
 			Log.d("sms_server", "server started");
-			findViewById(R.id.status_view).setBackgroundResource(R.drawable.server_on);
+			findViewById(R.id.status_view).setBackgroundResource(R.drawable.server_on_led);
 		}
         
     }

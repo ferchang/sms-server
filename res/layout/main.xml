@@ -19,9 +19,9 @@ android:padding="30sp"
 
 <View 
 android:id="@+id/status_view"
-android:layout_width="30dp"
-    android:layout_height="30dp"
-    android:background="@drawable/server_off"/>
+android:layout_width="30sp"
+    android:layout_height="30sp"
+    android:background="@drawable/server_off_led"/>
 
 <TextView 
 android:id="@+id/port"
