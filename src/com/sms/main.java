@@ -8,6 +8,8 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 //----------------
 
+import com.koushikdutta.async.callback.CompletedCallback;
+
 import android.widget.TextView;
 
 import android.telephony.SmsManager;
@@ -31,6 +33,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import com.koushikdutta.async.AsyncServerSocket;
 import com.koushikdutta.async.AsyncServer;
 import com.koushikdutta.async.http.server.AsyncHttpServer;
 import com.koushikdutta.async.http.server.AsyncHttpServerRequest;
@@ -40,7 +43,7 @@ import com.koushikdutta.async.http.body.AsyncHttpRequestBody;
 import com.koushikdutta.async.http.Multimap;
 import com.koushikdutta.async.http.Headers;
 
-public class Main extends Activity
+public class Main extends Activity implements CompletedCallback
 {
 	
 	private int port;
@@ -53,6 +56,10 @@ public class Main extends Activity
 	
 	private AsyncHttpServer server = new AsyncHttpServer();
     private AsyncServer mAsyncServer = new AsyncServer();
+	
+	public void onCompleted(Exception ex) {
+		Log.d("sms_server", ex.getMessage());
+	}
 	
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -180,8 +187,11 @@ public class Main extends Activity
 		server.stop();
 		mAsyncServer.stop();
 		
+		server.setErrorCallback(this);
+		
 		Log.d("sms_server", "starting server...");
-		server.listen(mAsyncServer, port);
+		AsyncServerSocket tmp=server.listen(mAsyncServer, port);
+		if(tmp==null) Log.d("sms_server", "port error");
         
     }
 	
