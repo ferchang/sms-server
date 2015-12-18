@@ -52,7 +52,8 @@ public class Main extends Activity implements CompletedCallback
 	
 	private final int DEFAULT_PORT=8888;
 	
-	private static final int EDIT_ID = Menu.FIRST;
+	private static final int MENU_OPTIONS = Menu.FIRST;
+	private static final int MENU_ABOUT = Menu.FIRST+1;
 
 	private enum Actions { DIRECT, DIRECT8SAVE, BUILTIN, COPY }
 	
@@ -216,15 +217,15 @@ public class Main extends Activity implements CompletedCallback
 	
 	//------------------------------
 	public boolean onCreateOptionsMenu(Menu menu) {
-		menu.add(Menu.NONE, EDIT_ID, Menu.NONE, "Options");
-		menu.add(Menu.NONE, EDIT_ID, Menu.NONE, "About");
+		menu.add(Menu.NONE, MENU_OPTIONS, Menu.NONE, "Options");
+		menu.add(Menu.NONE, MENU_ABOUT, Menu.NONE, "About");
 		return(super.onCreateOptionsMenu(menu));
 	}
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-			case EDIT_ID:
+			case MENU_OPTIONS:
 				startActivity(new Intent(this, Prefs.class));
 				return(true);
 		}
