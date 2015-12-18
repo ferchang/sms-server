@@ -10,6 +10,8 @@ import android.preference.PreferenceManager;
 
 import com.koushikdutta.async.callback.CompletedCallback;
 
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.OvalShape;
 import android.widget.TextView;
 
 import android.telephony.SmsManager;
@@ -189,9 +191,15 @@ public class Main extends Activity implements CompletedCallback
 		
 		server.setErrorCallback(this);
 		
-		Log.d("sms_server", "starting server...");
 		AsyncServerSocket tmp=server.listen(mAsyncServer, port);
-		if(tmp==null) Log.d("sms_server", "port error");
+		if(tmp==null) {
+			Log.d("sms_server", "server start failed");
+			findViewById(R.id.status_view).setBackgroundResource(R.drawable.server_off);
+		}
+		else {
+			Log.d("sms_server", "server started");
+			findViewById(R.id.status_view).setBackgroundResource(R.drawable.server_on);
+		}
         
     }
 	
