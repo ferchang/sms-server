@@ -227,7 +227,12 @@ public class Main extends Activity implements CompletedCallback
 		switch (item.getItemId()) {
 			case MENU_OPTIONS:
 				startActivity(new Intent(this, Prefs.class));
-				return(true);
+			break;
+			case MENU_ABOUT:
+				Intent intent = new Intent();
+				intent.setClass(this, About.class);
+				startActivity(intent);
+			break;
 		}
 		return(super.onOptionsItemSelected(item));
 	}
