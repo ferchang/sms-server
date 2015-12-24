@@ -1,5 +1,7 @@
 package com.sms;
 
+import java.util.ArrayList;
+
 //----------------
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -139,9 +141,20 @@ public class Main extends Activity implements CompletedCallback
 					case DIRECT:
 					case DIRECT8SAVE:
 						Log.d("sms_server", "enum direct/direct8save");
-						//if(true) return;
-						SmsManager smsManager = SmsManager.getDefault();
-						smsManager.sendTextMessage(vars.getString("number"), null, vars.getString("message"), null, null);
+						//SmsManager smsManager = SmsManager.getDefault();
+						//smsManager.sendTextMessage(vars.getString("number"), null, vars.getString("message"), null, null);
+						SmsManager sms = SmsManager.getDefault();
+						ArrayList<String> parts = sms.divideMessage(vars.getString("message"));
+						
+						Log.d("sms_server", "==========================");
+						for (int i = 0; i < parts.size(); i++) {
+							Log.d("sms_server", i+1+": "+parts.get(i).length()+"\n");
+						}
+						Log.d("sms_server", "==========================");
+						
+						Log.d("sms_server", "sendMultipartTextMessage>");
+						sms.sendMultipartTextMessage(vars.getString("number"), null, parts, null, null);
+						Log.d("sms_server", "<sendMultipartTextMessage");
 						if(action==Actions.DIRECT8SAVE) {
 							ContentValues values = new ContentValues();
 							values.put("address", vars.getString("number"));
