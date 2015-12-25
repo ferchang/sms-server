@@ -206,11 +206,11 @@ public class Main extends Activity implements CompletedCallback
             }
         });
 
-		server.get("/js.cookie.js", new HttpServerRequestCallback() {
+		server.get("/jscookie.js", new HttpServerRequestCallback() {
             @Override
             public void onRequest(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
-				Log.d("sms_server", "get js.cookie.js");
-				response.send(getRawResourceStr(R.raw.jquery));
+				Log.d("sms_server", "get jscookie.js");
+				response.send(getRawResourceStr(R.raw.jscookie));
             }
         });
 		
