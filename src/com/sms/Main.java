@@ -198,6 +198,14 @@ public class Main extends Activity implements CompletedCallback
             }
         });
 		
+		server.get("/jquery.js", new HttpServerRequestCallback() {
+            @Override
+            public void onRequest(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
+				Log.d("sms_server", "get jquery.js");
+				response.send(getRawResourceStr(R.raw.jquery));
+            }
+        });
+		
 		//---------------------------------------------
 		
 		server.stop();
