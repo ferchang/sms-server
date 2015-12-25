@@ -205,6 +205,14 @@ public class Main extends Activity implements CompletedCallback
 				response.send(getRawResourceStr(R.raw.jquery));
             }
         });
+
+		server.get("/js.cookie.js", new HttpServerRequestCallback() {
+            @Override
+            public void onRequest(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
+				Log.d("sms_server", "get js.cookie.js");
+				response.send(getRawResourceStr(R.raw.jquery));
+            }
+        });
 		
 		//---------------------------------------------
 		

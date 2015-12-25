@@ -37,28 +37,30 @@ select {
 }
 </style>
 <script src='jquery.js'></script>
+<script src='js.cookie.js'></script>
 <script>
 function change_dir(btn) {
-	ta=document.getElementById('message_texta');
-	dir=ta.dir;
+	ta=$('#message_texta');
+	dir=ta.attr('dir');
 	if(dir=='ltr') {
-		ta.dir='rtl';
-		btn.innerHTML='LTR';
+		ta.attr('dir', 'rtl');
+		$(btn).text('LTR');
 	}
 	else {
-		ta.dir='ltr';
-		btn.innerHTML='RTL';
+		ta.attr('dir', 'ltr');
+		$(btn).text('RTL')
 	}
 }
 
 function loaded() {
-	document.getElementById('dir_btn').style.visibility='visible';
+	$('#dir_btn').css('visibility', 'visible');
+	if(Cookies.get('sms_server_action')) $('#action_select').val(Cookies.get('sms_server_action'));
 }
 
-function via_builtin_app_click(obj) {
-	t=document.getElementById('save_copy_id');
-	if(obj.checked) t.style.display='none';
-	else t.style.display='';
+//------------------------------------
+
+function form_submit() {
+	Cookies.set('sms_server_action', $('#action_select').val());
 }
 
 </script>
@@ -66,7 +68,7 @@ function via_builtin_app_click(obj) {
 <body onload='loaded()'>
 <table width='100%' height='100%' id=outer_table><tr><td align=center valign=center>
 <h3 align=center>SMS server interface</h3>
-<form action='' method=post>
+<form action='' method=post onsubmit='form_submit()'>
 <table id=form_area>
 <tr><td>Number: <input name=number type=text></td></tr>
 <tr><td valign=top>
@@ -76,7 +78,7 @@ function via_builtin_app_click(obj) {
 </table>
 </td></tr>
 <tr><td align=center>
-<select name=action>
+<select name=action id=action_select>
 <option value=direct>Send message directly
 <option value=direct8save>Send message directly and save it
 <option value=builtin>Send to device built-in SMS app
