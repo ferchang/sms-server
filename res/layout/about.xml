@@ -9,11 +9,12 @@
     android:orientation="vertical" >
 	
 <TextView 
-android:text="HHHHHHHHHHHHHHHHHHHHH"
+android:text="Program by:\n\nhamidreza.mz712 -=At=- gmail.com\n\nProject home:\n\nhttps://github.com/ferchang/sms-server"
 android:layout_width="wrap_content"
 android:layout_height="wrap_content"
 android:layout_centerInParent="true"
-android:textSize="30sp"
+android:gravity="center"
+android:textSize="15sp"
 android:padding="30sp"
 />
 
