@@ -95,12 +95,10 @@ public class Main extends Activity {
    
 	 private void startServer() {
 	
-		test ttt=new test(server, this);
+		new HttpResponder(server, this);
 		
 		server.stop();
 		mAsyncServer.stop();
-		
-		server.setErrorCallback(ttt);
 		
 		AsyncServerSocket tmp=server.listen(mAsyncServer, port);
 		if(tmp==null) {
