@@ -1,28 +1,14 @@
 package com.sms;
 
-import java.util.ArrayList;
-
-//----------------
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-//----------------
 
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.widget.TextView;
-
-import android.telephony.SmsManager;
-
-import android.net.Uri;
-
-import android.content.ClipboardManager;
-import android.content.ClipData;
-import android.content.Context;
-
-import android.content.ContentValues;
 
 import java.io.InputStream;
 import java.io.IOException; 
@@ -38,12 +24,6 @@ import android.widget.Button;
 import com.koushikdutta.async.AsyncServerSocket;
 import com.koushikdutta.async.AsyncServer;
 import com.koushikdutta.async.http.server.AsyncHttpServer;
-import com.koushikdutta.async.http.server.AsyncHttpServerRequest;
-import com.koushikdutta.async.http.server.AsyncHttpServerResponse;
-import com.koushikdutta.async.http.server.HttpServerRequestCallback;
-import com.koushikdutta.async.http.body.AsyncHttpRequestBody;
-import com.koushikdutta.async.http.Multimap;
-import com.koushikdutta.async.http.Headers;
 
 public class Main extends Activity {
 	
@@ -117,70 +97,6 @@ public class Main extends Activity {
    
 	 private void startServer() {
 		 
-		 //---------------------------------------------
-		 
-        server.post("/", new HttpServerRequestCallback() {
-            @Override
-            public void onRequest(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
-
-				AsyncHttpRequestBody rb=request.getBody();
-				Multimap vars=(Multimap) rb.get();
-				
-				String host=request.getHeaders().get("host");
-				
-				Actions action=Actions.valueOf(vars.getString("action").toUpperCase());
-			
-				switch(action) {
-					case DIRECT:
-					case DIRECT8SAVE:
-						Log.d("sms_server", "enum direct/direct8save");
-						//SmsManager smsManager = SmsManager.getDefault();
-						//smsManager.sendTextMessage(vars.getString("number"), null, vars.getString("message"), null, null);
-						SmsManager sms = SmsManager.getDefault();
-						ArrayList<String> parts = sms.divideMessage(vars.getString("message"));
-						
-						Log.d("sms_server", "==========================");
-						for (int i = 0; i < parts.size(); i++) {
-							Log.d("sms_server", i+1+": "+parts.get(i).length()+"\n");
-						}
-						Log.d("sms_server", "==========================");
-						
-						Log.d("sms_server", "sendMultipartTextMessage>");
-						sms.sendMultipartTextMessage(vars.getString("number"), null, parts, null, null);
-						Log.d("sms_server", "<sendMultipartTextMessage");
-						if(action==Actions.DIRECT8SAVE) {
-							ContentValues values = new ContentValues();
-							values.put("address", vars.getString("number"));
-							values.put("body", vars.getString("message"));
-							getContentResolver().insert(Uri.parse("content://sms/sent"), values);
-						}
-					break;
-					case BUILTIN:
-						Log.d("sms_server", "enum builtin");
-						Intent sendIntent = new Intent(Intent.ACTION_VIEW);
-						sendIntent.putExtra("sms_body", vars.getString("message")); 
-						sendIntent.setType("vnd.android-dir/mms-sms");
-						sendIntent.putExtra("address"  , new String (vars.getString("number")));
-						startActivity(sendIntent);
-					break;
-					case COPY:
-						Log.d("sms_server", "enum copy");
-						final String fmessage=vars.getString("message");
-						runOnUiThread(new Runnable() {
-							@Override
-							public void run() {
-								ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-								ClipData clip = ClipData.newPlainText("message", fmessage);
-								clipboard.setPrimaryClip(clip);
-							}
-						});
-					break;
-				}
-			
-				response.send(getRawResourceStr(R.raw.ok).replace("%%host%%", host));
-            }
-        });
-		
 		//---------------------------------------------
 		
 		test ttt=new test(server, this);
