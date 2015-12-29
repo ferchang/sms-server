@@ -8,7 +8,9 @@ import android.util.Log;
 import android.app.Activity;
 import android.content.Context;
 
-class test {
+import com.koushikdutta.async.callback.CompletedCallback;
+
+class test implements CompletedCallback {
 	
 	test(AsyncHttpServer server, final Main actvt) {
 		
@@ -41,6 +43,10 @@ class test {
             }
         });
 		
+	}
+	
+	public void onCompleted(Exception ex) {
+		Log.d("sms_server", ex.getMessage());
 	}
 	
 }

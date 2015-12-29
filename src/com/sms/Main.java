@@ -10,8 +10,6 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 //----------------
 
-import com.koushikdutta.async.callback.CompletedCallback;
-
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.widget.TextView;
@@ -47,8 +45,7 @@ import com.koushikdutta.async.http.body.AsyncHttpRequestBody;
 import com.koushikdutta.async.http.Multimap;
 import com.koushikdutta.async.http.Headers;
 
-public class Main extends Activity implements CompletedCallback
-{
+public class Main extends Activity {
 	
 	private int port;
 	
@@ -61,10 +58,6 @@ public class Main extends Activity implements CompletedCallback
 	
 	private AsyncHttpServer server = new AsyncHttpServer();
     private AsyncServer mAsyncServer = new AsyncServer();
-	
-	public void onCompleted(Exception ex) {
-		Log.d("sms_server", ex.getMessage());
-	}
 	
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -197,7 +190,7 @@ public class Main extends Activity implements CompletedCallback
 		server.stop();
 		mAsyncServer.stop();
 		
-		server.setErrorCallback(this);
+		server.setErrorCallback(ttt);
 		
 		AsyncServerSocket tmp=server.listen(mAsyncServer, port);
 		if(tmp==null) {
