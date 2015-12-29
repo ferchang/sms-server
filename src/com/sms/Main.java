@@ -33,8 +33,6 @@ public class Main extends Activity {
 	
 	private static final int MENU_OPTIONS = Menu.FIRST;
 	private static final int MENU_ABOUT = Menu.FIRST+1;
-
-	private enum Actions { DIRECT, DIRECT8SAVE, BUILTIN, COPY }
 	
 	private AsyncHttpServer server = new AsyncHttpServer();
     private AsyncServer mAsyncServer = new AsyncServer();
@@ -44,7 +42,7 @@ public class Main extends Activity {
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-		Log.d("sms_server", "-------------");
+		Log.d("sms_server", "---------------------------------");
 		Log.d("sms_server", "create");		
     }
 	
@@ -96,12 +94,8 @@ public class Main extends Activity {
    }
    
 	 private void startServer() {
-		 
-		//---------------------------------------------
-		
+	
 		test ttt=new test(server, this);
-
-		//---------------------------------------------
 		
 		server.stop();
 		mAsyncServer.stop();
@@ -111,11 +105,11 @@ public class Main extends Activity {
 		AsyncServerSocket tmp=server.listen(mAsyncServer, port);
 		if(tmp==null) {
 			Log.d("sms_server", "server start failed");
-			findViewById(R.id.status_view).setBackgroundResource(R.drawable.server_off_led);
+			findViewById(R.id.status_view).setBackgroundResource(R.drawable.server_off_lamp);
 		}
 		else {
 			Log.d("sms_server", "server started");
-			findViewById(R.id.status_view).setBackgroundResource(R.drawable.server_on_led);
+			findViewById(R.id.status_view).setBackgroundResource(R.drawable.server_on_lamp);
 		}
         
     }
@@ -150,7 +144,5 @@ public class Main extends Activity {
 		}
 		return(super.onOptionsItemSelected(item));
 	}
-	
-	//------------------------------
-	
+
 }
