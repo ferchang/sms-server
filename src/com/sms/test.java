@@ -31,7 +31,10 @@ class test implements HttpServerRequestCallback, CompletedCallback {
 				response.send(actvt.getRawResourceStr(R.raw.jquery));
 		else if(path.equals("/jscookie.js"))
 				response.send(actvt.getRawResourceStr(R.raw.jscookie));
-		else Log.d("sms_server", "unknown path: "+path);
+		else {
+			response.send("unknown path: "+path);
+			Log.d("sms_server", "unknown path: "+path);
+		}
 	}
 	
 	public void onCompleted(Exception ex) {
