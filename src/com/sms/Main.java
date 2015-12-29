@@ -189,31 +189,9 @@ public class Main extends Activity implements CompletedCallback
         });
 		
 		//---------------------------------------------
-
-		server.get("/", new HttpServerRequestCallback() {
-            @Override
-            public void onRequest(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
-				Log.d("sms_server", "get");
-				response.send(getRawResourceStr(R.raw.iface));
-            }
-        });
 		
-		server.get("/jquery.js", new HttpServerRequestCallback() {
-            @Override
-            public void onRequest(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
-				Log.d("sms_server", "get jquery.js");
-				response.send(getRawResourceStr(R.raw.jquery));
-            }
-        });
+		test ttt=new test(server, this);
 
-		server.get("/jscookie.js", new HttpServerRequestCallback() {
-            @Override
-            public void onRequest(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
-				Log.d("sms_server", "get jscookie.js");
-				response.send(getRawResourceStr(R.raw.jscookie));
-            }
-        });
-		
 		//---------------------------------------------
 		
 		server.stop();
@@ -233,7 +211,7 @@ public class Main extends Activity implements CompletedCallback
         
     }
 	
-	private String getRawResourceStr(int rid) {
+	protected String getRawResourceStr(int rid) {
 			String s="";
 		try {
 				InputStream is=getResources().openRawResource(rid);
