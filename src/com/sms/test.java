@@ -10,39 +10,28 @@ import android.content.Context;
 
 import com.koushikdutta.async.callback.CompletedCallback;
 
-class test implements CompletedCallback {
+class test implements HttpServerRequestCallback, CompletedCallback {
+	
+	private Main actvt;
 	
 	test(AsyncHttpServer server, final Main actvt) {
-		
-		server.get("/", new HttpServerRequestCallback() {
-            @Override
-            public void onRequest(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
-				Log.d("sms_server", "get");
-				response.send(actvt.getRawResourceStr(R.raw.iface));
-            }
-        });
-		
-		//----------------------------------
-		
-		server.get("/jquery.js", new HttpServerRequestCallback() {
-            @Override
-            public void onRequest(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
-				Log.d("sms_server", "get jquery.js");
+		this.actvt=actvt;
+		server.get("/", this);
+		server.get("/jquery.js", this);
+		server.get("/jscookie.js", this);
+	}
+	
+	@Override
+	public void onRequest(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
+		String path=request.getPath();
+		Log.d("sms_server", path);
+		if(path.equals("/"))
+			response.send(actvt.getRawResourceStr(R.raw.iface));
+		else if(path.equals("/jquery.js"))
 				response.send(actvt.getRawResourceStr(R.raw.jquery));
-            }
-        });
-		
-		//----------------------------------
-		
-		
-		server.get("/jscookie.js", new HttpServerRequestCallback() {
-            @Override
-            public void onRequest(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
-				Log.d("sms_server", "get jscookie.js");
+		else if(path.equals("/jscookie.js"))
 				response.send(actvt.getRawResourceStr(R.raw.jscookie));
-            }
-        });
-		
+		else Log.d("sms_server", "unknown path: "+path);
 	}
 	
 	public void onCompleted(Exception ex) {
