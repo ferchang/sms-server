@@ -43,7 +43,8 @@ public class Main extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 		Log.d("sms_server", "---------------------------------");
-		Log.d("sms_server", "create");		
+		Log.d("sms_server", "create");
+		PreferenceManager.setDefaultValues(this, R.xml.prefs, false);		
     }
 	
 	@Override
@@ -57,6 +58,10 @@ public class Main extends Activity {
         super.onResume();
 		Log.d("sms_server", "resume");
 		SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(this);
+		//------------------------
+		//boolean ttt=prefs.getBoolean("manualAuth", false);
+		//Log.d("sms_server", "manualAuth: "+ttt);
+		//------------------------
 		String tmp=prefs.getString("port", "");
 		if(tmp.equals("")) port=DEFAULT_PORT;
 		else port=Integer.parseInt(tmp);

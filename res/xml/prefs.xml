@@ -7,4 +7,29 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 	android:inputType="numberDecimal"
     />    
 
+	<PreferenceCategory android:title="Auth">
+
+	<PreferenceScreen android:title="Auth method">
+	
+	<CheckBoxPreference
+    android:title="Password"
+    android:key="passAuth" />
+		  
+	<CheckBoxPreference
+    android:title="Manual"
+    android:key="manualAuth"
+	android:defaultValue="true"
+	/>
+	
+	</PreferenceScreen>
+	
+	<EditTextPreference 
+    android:key="password" 
+    android:title="Password"
+	android:inputType=""
+    />
+
+	
+	</PreferenceCategory>
+	
 </PreferenceScreen>
