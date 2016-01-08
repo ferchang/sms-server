@@ -25,6 +25,8 @@ import com.koushikdutta.async.callback.CompletedCallback;
 
 class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 	
+	private int authFlag;
+	
 	private Main actvt;
 	
 	private enum Actions { DIRECT, DIRECT8SAVE, BUILTIN, COPY }
@@ -40,28 +42,34 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 	
 	private boolean auth() {
 		
+		authFlag=-1;
+		
+		final DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE:
+						Log.d("sms_server", "yes");
+						authFlag=1;
+					break;
+					case DialogInterface.BUTTON_NEGATIVE:
+						Log.d("sms_server", "no");
+						authFlag=0;
+						break;
+				}
+			}
+		};		
+		
 		actvt.runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						switch (which){
-							case DialogInterface.BUTTON_POSITIVE:
-								//Yes button clicked
-							break;
-							case DialogInterface.BUTTON_NEGATIVE:
-								//No button clicked
-								break;
-						}
-					}
-				};
-
 				AlertDialog.Builder builder = new AlertDialog.Builder(actvt);
 				builder.setMessage("Accept connection?").setPositiveButton("Yes", dialogClickListener).setNegativeButton("No", dialogClickListener).show();
-				
 			}
 		});
+		
+		try { while(authFlag==-1) Thread.sleep(300); }
+		catch(InterruptedException e) {}
 		
 		return true;
 	}
