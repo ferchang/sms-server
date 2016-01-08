@@ -6,6 +6,8 @@ import android.view.MenuItem;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import android.content.SharedPreferences.Editor;
+
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.widget.TextView;
@@ -63,7 +65,12 @@ public class Main extends Activity {
 		//Log.d("sms_server", "manualAuth: "+ttt);
 		//------------------------
 		String tmp=prefs.getString("port", "");
-		if(tmp.equals("")) port=DEFAULT_PORT;
+		if(tmp.equals("")) {
+			port=DEFAULT_PORT;
+			Editor editor = prefs.edit();
+			editor.putString("port", Integer.toString(port));
+			editor.commit();
+		}
 		else port=Integer.parseInt(tmp);
 		Log.d("sms_server", "port: "+Integer.toString(port));
         startServer();
