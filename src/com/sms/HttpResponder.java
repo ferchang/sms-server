@@ -48,17 +48,35 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 	
 	private boolean auth(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
 		
-		String token="xxx";
+		String auth_token="xxx";
+		boolean authSuccess=false;
+		
+		String path=request.getPath();
 		
 		Headers headers=request.getHeaders();
-		Log.d("sms_server", "header: "+headers.get("cookie"));
+		String cookies=headers.get("cookie");
+		Log.d("sms_server", "cookies: "+cookies);
+		if(cookies.indexOf(token)!=-1) {
+			Log.d("sms_server", "auth ok");
+			authSuccess=true;
+		}
+		else Log.d("sms_server", "auth not ok");
+		
+		if(authSuccess) return true;
+		
+		if(path.equals("/") || path.equals("/action")) return true;
+		
+		if(path.equals("/auth.js") )
 		
 		//-----
 		if(path.equals("/auth.js")) {
 			Log.d("sms_server", "setting auth header...");
-			response.send("Cookies.set('sms_server_auth', 'vvvvvv');");
+			response.send("Cookies.set('sms_server_auth', '"+token+"');");
+			return false;
 		}
 		//-----
+		
+		if(true) return true;
 		
 		authFlag=-1;
 		
@@ -100,14 +118,14 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 		String path=request.getPath();
 		Log.d("sms_server", path);
 		
-		if(path.equals("/") || path.equals("/action")) if(!auth(request, response)) return;
+		if(path.equals("/") || path.equals("/action") || path.equals("/auth.js")) if(!auth(request, response)) return;
 	
-		if(path.equals("/"))
-			response.send(actvt.getRawResourceStr(R.raw.iface));
+		if(path.equals("/")) response.send(actvt.getRawResourceStr(R.raw.iface));
 		else if(path.equals("/jquery.js"))
 				response.send(actvt.getRawResourceStr(R.raw.jquery));
 		else if(path.equals("/jscookie.js"))
 				response.send(actvt.getRawResourceStr(R.raw.jscookie));
+		else if(path.equals("/auth.js")) response.send("");
 		else if(path.equals("/action")) {
 		//===================
 				AsyncHttpRequestBody rb=request.getBody();
