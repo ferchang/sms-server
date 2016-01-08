@@ -53,14 +53,12 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 	private boolean auth(final AsyncHttpServerRequest request, final AsyncHttpServerResponse response) {
 		
 		final SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(actvt);
-		boolean manualAuth=prefs.getBoolean("manualAuth", false);
-		boolean passAuth=prefs.getBoolean("passAuth", false);
-		if(!manualAuth && !passAuth) return true;
+		boolean manual_auth=prefs.getBoolean("manual_auth", false);
+		boolean password_auth=prefs.getBoolean("password_auth", false);
+		if(!manual_auth && !password_auth) return true;
 		
 		final String auth_token=prefs.getString("auth_token", "");
 
-		//Log.d("sms_server", UUID.randomUUID().toString());
-		
 		final String path=request.getPath();
 		
 		Headers headers=request.getHeaders();
@@ -81,14 +79,13 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 					case DialogInterface.BUTTON_POSITIVE:
 						Log.d("sms_server", "yes");
 						authFlag=1;
-						int rid;
-						if(path.equals("/")) rid=R.raw.iface;
-						else rid=R.raw.ok;
+						int rid=R.raw.iface;
+						if(!path.equals("/")) rid=R.raw.ok;
 						String tok=UUID.randomUUID().toString();
+						response.send(actvt.getRawResourceStr(rid).replace("//%%auth%%", "Cookies.set('sms_server_auth', '"+tok+"');"));
 						Editor editor=prefs.edit();
 						editor.putString("auth_token", tok);
 						editor.commit();
-						response.send(actvt.getRawResourceStr(rid).replace("//%%auth%%", "Cookies.set('sms_server_auth', '"+tok+"');"));
 					break;
 					case DialogInterface.BUTTON_NEGATIVE:
 						Log.d("sms_server", "no");

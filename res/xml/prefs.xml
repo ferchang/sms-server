@@ -13,11 +13,11 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 	
 	<CheckBoxPreference
     android:title="Password"
-    android:key="passAuth" />
+    android:key="password_auth" />
 		  
 	<CheckBoxPreference
     android:title="Manual"
-    android:key="manualAuth"
+    android:key="manual_auth"
 	android:defaultValue="true"
 	/>
 	
