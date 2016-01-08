@@ -2,6 +2,11 @@ package com.sms;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import java.util.UUID;
+
+import android.content.SharedPreferences.Editor;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import com.koushikdutta.async.http.Headers;
 import android.net.Uri;
@@ -47,14 +52,21 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 	
 	private boolean auth(final AsyncHttpServerRequest request, final AsyncHttpServerResponse response) {
 		
-		final String auth_token="xxx";
+		final SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(actvt);
+		boolean manualAuth=prefs.getBoolean("manualAuth", false);
+		boolean passAuth=prefs.getBoolean("passAuth", false);
+		if(!manualAuth && !passAuth) return true;
+		
+		final String auth_token=prefs.getString("auth_token", "");
+
+		//Log.d("sms_server", UUID.randomUUID().toString());
 		
 		final String path=request.getPath();
 		
 		Headers headers=request.getHeaders();
 		String cookies=headers.get("cookie");
 		Log.d("sms_server", "cookies: "+cookies);
-		if(cookies!=null && cookies.indexOf(auth_token)!=-1) {
+		if(cookies!=null && !auth_token.equals("") && cookies.indexOf(auth_token)!=-1) {
 			Log.d("sms_server", "auth ok");
 			return true;
 		}
@@ -69,7 +81,14 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 					case DialogInterface.BUTTON_POSITIVE:
 						Log.d("sms_server", "yes");
 						authFlag=1;
-						if(path.equals("/")) response.send(actvt.getRawResourceStr(R.raw.iface).replace("//%%auth%%", "Cookies.set('sms_server_auth', '"+auth_token+"');"));
+						int rid;
+						if(path.equals("/")) rid=R.raw.iface;
+						else rid=R.raw.ok;
+						String tok=UUID.randomUUID().toString();
+						Editor editor=prefs.edit();
+						editor.putString("auth_token", tok);
+						editor.commit();
+						response.send(actvt.getRawResourceStr(rid).replace("//%%auth%%", "Cookies.set('sms_server_auth', '"+tok+"');"));
 					break;
 					case DialogInterface.BUTTON_NEGATIVE:
 						Log.d("sms_server", "no");
