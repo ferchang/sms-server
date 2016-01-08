@@ -3,7 +3,7 @@ package com.sms;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 
-import com.koushikdutta.async.http.*;
+import com.koushikdutta.async.http.Headers;
 import android.net.Uri;
 import android.content.Context;
 import android.content.ClipData;
@@ -48,7 +48,6 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 	private boolean auth(final AsyncHttpServerRequest request, final AsyncHttpServerResponse response) {
 		
 		final String auth_token="xxx";
-		boolean authSuccess=false;
 		
 		final String path=request.getPath();
 		
@@ -57,11 +56,9 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 		Log.d("sms_server", "cookies: "+cookies);
 		if(cookies!=null && cookies.indexOf(auth_token)!=-1) {
 			Log.d("sms_server", "auth ok");
-			authSuccess=true;
+			return true;
 		}
 		else Log.d("sms_server", "auth not ok");
-		
-		if(authSuccess) return true;
 
 		authFlag=-1;
 		
