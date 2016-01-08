@@ -79,10 +79,12 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 					case DialogInterface.BUTTON_POSITIVE:
 						Log.d("sms_server", "yes");
 						authFlag=1;
-						int rid=R.raw.iface;
-						if(!path.equals("/")) rid=R.raw.ok;
+						String out;
+						if(path.equals("/")) out=actvt.getRawResourceStr(R.raw.iface);
+						else out=actvt.getRawResourceStr(R.raw.ok).replace("%%host%%", request.getHeaders().get("host"));
 						String tok=UUID.randomUUID().toString();
-						response.send(actvt.getRawResourceStr(rid).replace("//%%auth%%", "Cookies.set('sms_server_auth', '"+tok+"');"));
+						out=out.replace("//%%auth%%", "Cookies.set('sms_server_auth', '"+tok+"');");
+						response.send(out);
 						Editor editor=prefs.edit();
 						editor.putString("auth_token", tok);
 						editor.commit();
