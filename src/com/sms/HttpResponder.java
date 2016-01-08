@@ -1,5 +1,8 @@
 package com.sms;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+
 import android.net.Uri;
 import android.content.Context;
 import android.content.ClipData;
@@ -35,8 +38,40 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 		server.setErrorCallback(this);
 	}
 	
+	private boolean auth() {
+		
+		actvt.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						switch (which){
+							case DialogInterface.BUTTON_POSITIVE:
+								//Yes button clicked
+							break;
+							case DialogInterface.BUTTON_NEGATIVE:
+								//No button clicked
+								break;
+						}
+					}
+				};
+
+				AlertDialog.Builder builder = new AlertDialog.Builder(actvt);
+				builder.setMessage("Accept connection?").setPositiveButton("Yes", dialogClickListener).setNegativeButton("No", dialogClickListener).show();
+				
+			}
+		});
+		
+		return true;
+	}
+	
 	@Override
 	public void onRequest(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
+		if(!auth()) {
+			response.send("auth failed");
+			return;
+		}
 		String path=request.getPath();
 		Log.d("sms_server", path);
 		if(path.equals("/"))
