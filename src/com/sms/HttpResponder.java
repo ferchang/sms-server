@@ -39,45 +39,30 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 		server.get("/", this);
 		server.get("/jquery.js", this);
 		server.get("/jscookie.js", this);
-		server.get("/auth.js", this);
 		server.post("/action", this);
 		server.setErrorCallback(this);
 	}
 	
 	//-----------------------------------------------------
 	
-	private boolean auth(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
+	private boolean auth(final AsyncHttpServerRequest request, final AsyncHttpServerResponse response) {
 		
-		String auth_token="xxx";
+		final String auth_token="xxx";
 		boolean authSuccess=false;
 		
-		String path=request.getPath();
+		final String path=request.getPath();
 		
 		Headers headers=request.getHeaders();
 		String cookies=headers.get("cookie");
 		Log.d("sms_server", "cookies: "+cookies);
-		if(cookies.indexOf(token)!=-1) {
+		if(cookies!=null && cookies.indexOf(auth_token)!=-1) {
 			Log.d("sms_server", "auth ok");
 			authSuccess=true;
 		}
 		else Log.d("sms_server", "auth not ok");
 		
 		if(authSuccess) return true;
-		
-		if(path.equals("/") || path.equals("/action")) return true;
-		
-		if(path.equals("/auth.js") )
-		
-		//-----
-		if(path.equals("/auth.js")) {
-			Log.d("sms_server", "setting auth header...");
-			response.send("Cookies.set('sms_server_auth', '"+token+"');");
-			return false;
-		}
-		//-----
-		
-		if(true) return true;
-		
+
 		authFlag=-1;
 		
 		final DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
@@ -87,11 +72,13 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 					case DialogInterface.BUTTON_POSITIVE:
 						Log.d("sms_server", "yes");
 						authFlag=1;
+						if(path.equals("/")) response.send(actvt.getRawResourceStr(R.raw.iface).replace("//%%auth%%", "Cookies.set('sms_server_auth', '"+auth_token+"');"));
 					break;
 					case DialogInterface.BUTTON_NEGATIVE:
 						Log.d("sms_server", "no");
 						authFlag=0;
-						break;
+						response.send("Access denied!");
+					break;
 				}
 			}
 		};		
@@ -107,7 +94,8 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 		try { while(authFlag==-1) Thread.sleep(300); }
 		catch(InterruptedException e) {}
 		
-		return true;
+		return false;
+		
 	}
 	
 	//-----------------------------------------------------
@@ -118,14 +106,14 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 		String path=request.getPath();
 		Log.d("sms_server", path);
 		
-		if(path.equals("/") || path.equals("/action") || path.equals("/auth.js")) if(!auth(request, response)) return;
+		if(path.equals("/") || path.equals("/action")) if(!auth(request, response)) return;
 	
-		if(path.equals("/")) response.send(actvt.getRawResourceStr(R.raw.iface));
+		if(path.equals("/"))
+			response.send(actvt.getRawResourceStr(R.raw.iface));
 		else if(path.equals("/jquery.js"))
-				response.send(actvt.getRawResourceStr(R.raw.jquery));
+			response.send(actvt.getRawResourceStr(R.raw.jquery));
 		else if(path.equals("/jscookie.js"))
-				response.send(actvt.getRawResourceStr(R.raw.jscookie));
-		else if(path.equals("/auth.js")) response.send("");
+			response.send(actvt.getRawResourceStr(R.raw.jscookie));
 		else if(path.equals("/action")) {
 		//===================
 				AsyncHttpRequestBody rb=request.getBody();
