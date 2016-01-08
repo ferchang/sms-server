@@ -3,6 +3,7 @@ package com.sms;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 
+import com.koushikdutta.async.http.*;
 import android.net.Uri;
 import android.content.Context;
 import android.content.ClipData;
@@ -31,23 +32,40 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 	
 	private enum Actions { DIRECT, DIRECT8SAVE, BUILTIN, COPY }
 	
+	//-----------------------------------------------------
+	
 	HttpResponder(AsyncHttpServer server, final Main actvt) {
 		this.actvt=actvt;
 		server.get("/", this);
 		server.get("/jquery.js", this);
 		server.get("/jscookie.js", this);
+		server.get("/auth.js", this);
 		server.post("/action", this);
 		server.setErrorCallback(this);
 	}
 	
-	private boolean auth() {
+	//-----------------------------------------------------
+	
+	private boolean auth(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
+		
+		String token="xxx";
+		
+		Headers headers=request.getHeaders();
+		Log.d("sms_server", "header: "+headers.get("cookie"));
+		
+		//-----
+		if(path.equals("/auth.js")) {
+			Log.d("sms_server", "setting auth header...");
+			response.send("Cookies.set('sms_server_auth', 'vvvvvv');");
+		}
+		//-----
 		
 		authFlag=-1;
 		
 		final DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
+				switch(which) {
 					case DialogInterface.BUTTON_POSITIVE:
 						Log.d("sms_server", "yes");
 						authFlag=1;
@@ -74,14 +92,16 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 		return true;
 	}
 	
+	//-----------------------------------------------------
+	
 	@Override
 	public void onRequest(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
-		if(!auth()) {
-			response.send("auth failed");
-			return;
-		}
+		
 		String path=request.getPath();
 		Log.d("sms_server", path);
+		
+		if(path.equals("/") || path.equals("/action")) if(!auth(request, response)) return;
+	
 		if(path.equals("/"))
 			response.send(actvt.getRawResourceStr(R.raw.iface));
 		else if(path.equals("/jquery.js"))
@@ -89,7 +109,7 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 		else if(path.equals("/jscookie.js"))
 				response.send(actvt.getRawResourceStr(R.raw.jscookie));
 		else if(path.equals("/action")) {
-		//================================================
+		//===================
 				AsyncHttpRequestBody rb=request.getBody();
 				Multimap vars=(Multimap) rb.get();
 				
@@ -145,13 +165,15 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 				}
 			
 				response.send(actvt.getRawResourceStr(R.raw.ok).replace("%%host%%", host));
-		//================================================
+		//====================
 		}
 		else {
 			response.send("unknown path: "+path);
 			Log.d("sms_server", "unknown path: "+path);
 		}
 	}
+	
+	//-----------------------------------------------------
 	
 	public void onCompleted(Exception ex) {
 		Log.d("sms_server", ex.getMessage());
