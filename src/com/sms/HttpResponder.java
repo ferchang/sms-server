@@ -42,6 +42,7 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 	HttpResponder(AsyncHttpServer server, final Main actvt) {
 		this.actvt=actvt;
 		server.get("/", this);
+		server.post("/", this);
 		server.get("/jquery.js", this);
 		server.get("/jscookie.js", this);
 		server.post("/action", this);
@@ -52,14 +53,26 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 	
 	private boolean auth(final AsyncHttpServerRequest request, final AsyncHttpServerResponse response) {
 		
+		final String path=request.getPath();
+		final String reqMethod=request.getMethod();
 		final SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(actvt);
-		boolean manual_auth=prefs.getBoolean("manual_auth", false);
+		final String auth_token=prefs.getString("auth_token", "");
+		final String password0=prefs.getString("password", "");
+		final boolean manual_auth=prefs.getBoolean("manual_auth", false);
 		boolean password_auth=prefs.getBoolean("password_auth", false);
+		
 		if(!manual_auth && !password_auth) return true;
 		
-		final String auth_token=prefs.getString("auth_token", "");
-
-		final String path=request.getPath();
+		if(!manual_auth && password_auth && password0.equals("")) {
+			response.send("Error: No password is set!");
+			return false;
+		}
+		
+		boolean bothMethods=false;
+		if(manual_auth && password_auth) {
+			if(!password0.equals("")) bothMethods=true;
+			else password_auth=false;
+		}
 		
 		Headers headers=request.getHeaders();
 		String cookies=headers.get("cookie");
@@ -68,7 +81,42 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 			Log.d("sms_server", "auth ok");
 			return true;
 		}
-		else Log.d("sms_server", "auth not ok");
+		else {
+			Log.d("sms_server", "auth not ok");
+			if(path.equals("/action")) {
+				response.send("Access denied!");
+				return false;
+			}
+		}
+		
+		if(bothMethods) {
+			if(reqMethod.equals("GET")) {
+				response.send(actvt.getRawResourceStr(R.raw.auth));
+				return false;
+			}
+			else {
+				AsyncHttpRequestBody rb=request.getBody();
+				Multimap vars=(Multimap) rb.get();
+				String password1=vars.getString("password");
+				if(!password1.equals("")) {
+					if(password0.equals(password1)) {
+						String tok=UUID.randomUUID().toString();
+						String out=actvt.getRawResourceStr(R.raw.iface);
+						out=out.replace("//%%auth%%", "Cookies.set('sms_server_auth', '"+tok+"');");
+						response.send(out);
+						Editor editor=prefs.edit();
+						editor.putString("auth_token", tok);
+						editor.commit();
+						return false;
+					}
+					else {
+						response.send(actvt.getRawResourceStr(R.raw.auth));
+						return false;
+					}
+				}
+			}
+		}
+
 
 		authFlag=-1;
 		
