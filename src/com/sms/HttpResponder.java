@@ -237,7 +237,7 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 					break;
 				}
 			
-				response.send(actvt.getRawResourceStr(R.raw.ok).replace("%%host%%", host));
+				response.send(resourceStrReplace(R.raw.ok, "%%host%%", host));
 		//====================
 		}
 		else {
