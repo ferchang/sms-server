@@ -51,6 +51,12 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 	
 	//-----------------------------------------------------
 	
+	String resourceStrReplace(int rid, String needle, String haystack) {
+		return actvt.getRawResourceStr(rid).replace(needle, haystack);
+	}
+	
+	//-----------------------------------------------------
+	
 	private boolean auth(final AsyncHttpServerRequest request, final AsyncHttpServerResponse response) {
 		
 		final String path=request.getPath();
@@ -85,15 +91,11 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 			}
 		}
 		
-		if(reqMethod.equals("GET")) {
-			if(manual_auth && password_auth) {
-				response.send(actvt.getRawResourceStr(R.raw.auth).replace("%%msg%%", "Send an empty password for manual confirmation on device<br>"));
-				return false;
-			}
-			else if(password_auth) {
-				response.send(actvt.getRawResourceStr(R.raw.auth).replace("%%msg%%", ""));
-				return false;
-			}
+		if(password_auth && reqMethod.equals("GET")) {
+			String msg="";
+			if(manual_auth) msg="Send an empty password for manual confirmation on device<br>";
+			response.send(resourceStrReplace(R.raw.auth, "%%msg%%", msg));
+			return false;
 		}
 		
 		if(password_auth) {
@@ -103,17 +105,17 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 			Log.d("sms_server", password0+"/"+password1);
 			if(password0.equals(password1)) {
 				String tok=UUID.randomUUID().toString();
-				String out=actvt.getRawResourceStr(R.raw.iface);
-				out=out.replace("//%%auth%%", "Cookies.set('sms_server_auth', '"+tok+"');");
-				response.send(out);
+				response.send(resourceStrReplace(R.raw.iface, "//%%auth%%", "Cookies.set('sms_server_auth', '"+tok+"');"));
 				Editor editor=prefs.edit();
 				editor.putString("auth_token", tok);
 				editor.commit();
 				return false;
 			}
-			else if(!manual_auth) {
-				response.send(actvt.getRawResourceStr(R.raw.auth).replace("%%msg%%", ""));
-				return false;
+			else if(!manual_auth || !password1.equals("")) {
+					String msg="";
+					if(manual_auth) msg="Send an empty password for manual confirmation on device<br>";
+					response.send(resourceStrReplace(R.raw.auth, "%%msg%%", msg));
+					return false;
 			}
 		}
 
@@ -128,7 +130,7 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 						authFlag=1;
 						String out;
 						if(path.equals("/")) out=actvt.getRawResourceStr(R.raw.iface);
-						else out=actvt.getRawResourceStr(R.raw.ok).replace("%%host%%", request.getHeaders().get("host"));
+						else out=resourceStrReplace(R.raw.ok, "%%host%%", request.getHeaders().get("host"));
 						String tok=UUID.randomUUID().toString();
 						out=out.replace("//%%auth%%", "Cookies.set('sms_server_auth', '"+tok+"');");
 						response.send(out);
