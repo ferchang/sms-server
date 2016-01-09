@@ -68,11 +68,7 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 			return false;
 		}
 		
-		boolean bothMethods=false;
-		if(manual_auth && password_auth) {
-			if(!password0.equals("")) bothMethods=true;
-			else password_auth=false;
-		}
+		if(manual_auth && password_auth && password0.equals("")) password_auth=false;
 		
 		Headers headers=request.getHeaders();
 		String cookies=headers.get("cookie");
@@ -89,34 +85,37 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 			}
 		}
 		
-		if(bothMethods) {
-			if(reqMethod.equals("GET")) {
-				response.send(actvt.getRawResourceStr(R.raw.auth));
+		if(reqMethod.equals("GET")) {
+			if(manual_auth && password_auth) {
+				response.send(actvt.getRawResourceStr(R.raw.auth).replace("%%msg%%", "Send an empty password for manual confirmation on device<br>"));
 				return false;
 			}
-			else {
-				AsyncHttpRequestBody rb=request.getBody();
-				Multimap vars=(Multimap) rb.get();
-				String password1=vars.getString("password");
-				if(!password1.equals("")) {
-					if(password0.equals(password1)) {
-						String tok=UUID.randomUUID().toString();
-						String out=actvt.getRawResourceStr(R.raw.iface);
-						out=out.replace("//%%auth%%", "Cookies.set('sms_server_auth', '"+tok+"');");
-						response.send(out);
-						Editor editor=prefs.edit();
-						editor.putString("auth_token", tok);
-						editor.commit();
-						return false;
-					}
-					else {
-						response.send(actvt.getRawResourceStr(R.raw.auth));
-						return false;
-					}
-				}
+			else if(password_auth) {
+				response.send(actvt.getRawResourceStr(R.raw.auth).replace("%%msg%%", ""));
+				return false;
 			}
 		}
-
+		
+		if(password_auth) {
+			AsyncHttpRequestBody rb=request.getBody();
+			Multimap vars=(Multimap) rb.get();
+			String password1=vars.getString("password");
+			Log.d("sms_server", password0+"/"+password1);
+			if(password0.equals(password1)) {
+				String tok=UUID.randomUUID().toString();
+				String out=actvt.getRawResourceStr(R.raw.iface);
+				out=out.replace("//%%auth%%", "Cookies.set('sms_server_auth', '"+tok+"');");
+				response.send(out);
+				Editor editor=prefs.edit();
+				editor.putString("auth_token", tok);
+				editor.commit();
+				return false;
+			}
+			else if(!manual_auth) {
+				response.send(actvt.getRawResourceStr(R.raw.auth).replace("%%msg%%", ""));
+				return false;
+			}
+		}
 
 		authFlag=-1;
 		
