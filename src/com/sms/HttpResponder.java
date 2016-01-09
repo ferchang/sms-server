@@ -57,6 +57,17 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 	
 	//-----------------------------------------------------
 	
+	String createNewToken() {
+		final SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(actvt);
+		String tok=UUID.randomUUID().toString();
+		Editor editor=prefs.edit();
+		editor.putString("auth_token", tok);
+		editor.commit();
+		return tok;
+	}
+	
+	//-----------------------------------------------------
+	
 	private boolean auth(final AsyncHttpServerRequest request, final AsyncHttpServerResponse response) {
 		
 		final String path=request.getPath();
@@ -104,11 +115,7 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 			String password1=vars.getString("password");
 			Log.d("sms_server", password0+"/"+password1);
 			if(password0.equals(password1)) {
-				String tok=UUID.randomUUID().toString();
-				response.send(resourceStrReplace(R.raw.iface, "//%%auth%%", "Cookies.set('sms_server_auth', '"+tok+"');"));
-				Editor editor=prefs.edit();
-				editor.putString("auth_token", tok);
-				editor.commit();
+				response.send(resourceStrReplace(R.raw.iface, "//%%auth%%", "Cookies.set('sms_server_auth', '"+createNewToken()+"');"));
 				return false;
 			}
 			else if(!manual_auth || !password1.equals("")) {
@@ -131,12 +138,8 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 						String out;
 						if(path.equals("/")) out=actvt.getRawResourceStr(R.raw.iface);
 						else out=resourceStrReplace(R.raw.ok, "%%host%%", request.getHeaders().get("host"));
-						String tok=UUID.randomUUID().toString();
-						out=out.replace("//%%auth%%", "Cookies.set('sms_server_auth', '"+tok+"');");
+						out=out.replace("//%%auth%%", "Cookies.set('sms_server_auth', '"+createNewToken()+"');");
 						response.send(out);
-						Editor editor=prefs.edit();
-						editor.putString("auth_token", tok);
-						editor.commit();
 					break;
 					case DialogInterface.BUTTON_NEGATIVE:
 						Log.d("sms_server", "no");
