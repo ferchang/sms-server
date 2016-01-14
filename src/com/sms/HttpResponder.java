@@ -33,7 +33,7 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 	
 	private int authFlag;
 	
-	private Main actvt;
+	Main actvt;
 	
 	private enum Actions { DIRECT, DIRECT8SAVE, BUILTIN, COPY }
 	

@@ -31,6 +31,8 @@ public class Main extends Activity {
 	
 	private int port;
 	
+	private String serverFlag="x";
+	
 	private final int DEFAULT_PORT=8888;
 	
 	private static final int MENU_OPTIONS = Menu.FIRST;
@@ -55,16 +57,23 @@ public class Main extends Activity {
 		Log.d("sms_server", "start");
     }
 	
+	//----------------------------------------
+	@Override
+	public Object onRetainNonConfigurationInstance() {
+		Log.d("sms_server", "onRetainNonConfigurationInstance");
+		return new Object();
+	}
+	//----------------------------------------
+	
 	@Override
     public void onResume() {
         super.onResume();
 		Log.d("sms_server", "resume");
 		SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(this);
-		//------------------------
-		//boolean ttt=prefs.getBoolean("manualAuth", false);
-		//Log.d("sms_server", "manualAuth: "+ttt);
-		//------------------------
 		String tmp=prefs.getString("port", "");
+		//------------------------
+		if(serverFlag.equals(tmp)) return;
+		//------------------------
 		if(tmp.equals("")) {
 			port=DEFAULT_PORT;
 			Editor editor = prefs.edit();
@@ -76,6 +85,7 @@ public class Main extends Activity {
         startServer();
 		TextView portLbl = (TextView) findViewById(R.id.port);
 		portLbl.setText("Port: "+port);
+		serverFlag=Integer.toString(port);
 		
     }
 	
