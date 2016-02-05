@@ -87,10 +87,8 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 	
 	void showAuthPage(AsyncHttpServerRequest request, AsyncHttpServerResponse response, boolean manual_auth, String password1) {
 		String out=addCsrfToken(request, rawResourceStr(R.raw.auth));
-		if(!password1.equals("")) out=out.replace("<!-- %%error_msg%% -->", "<h4 style='color: red; background: yellow; display: inline; padding: 5px'>Password was wrong!</h4><br><br>");
-		String msg="";
-		if(manual_auth) msg="Send an empty password for manual confirmation on device<br>";
-		out=out.replace("%%msg%%", msg);
+		if(!password1.equals("")) out=out.replace("<!--%%error_msg%%-->", "<h4 style='color: red; background: yellow; display: inline; padding: 5px'>Password was wrong!</h4><br><br>");
+		if(manual_auth) out=out.replace("<!--%%msg%%-->", "Send an empty password for manual confirmation on device<br>");
 		response.send(out);
 	}
 	
