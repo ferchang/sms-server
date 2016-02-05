@@ -110,7 +110,7 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 		if(password_auth && reqMethod.equals("GET")) {
 			String msg="";
 			if(manual_auth) msg="Send an empty password for manual confirmation on device<br>";
-			response.send(rawResourceStrReplace(R.raw.auth, "%%msg%%", msg));
+			response.send(addCsrfToken(request, rawResourceStrReplace(R.raw.auth, "%%msg%%", msg)));
 			return false;
 		}
 		
@@ -125,7 +125,7 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 			else if(!manual_auth || !password1.equals("")) {
 					String msg="";
 					if(manual_auth) msg="Send an empty password for manual confirmation on device<br>";
-					response.send(rawResourceStrReplace(R.raw.auth, "%%msg%%", msg));
+					response.send(addCsrfToken(request, rawResourceStrReplace(R.raw.auth, "%%msg%%", msg)));
 					return false;
 			}
 		}

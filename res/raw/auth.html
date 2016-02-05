@@ -39,7 +39,7 @@ select {
 <script src='jscookie.js'></script>
 <script src='jquery.js'></script>
 <script>
-//%%auth_cookie%%
+//%%csrf_cookie%%
 </script>
 <script>
 </script>
@@ -48,6 +48,7 @@ select {
 <table width='100%' height='100%' id=outer_table><tr><td align=center valign=center>
 <h3 align=center>SMS server auth</h3>
 <form action='/' method=post >
+<input type=hidden name=csrf_token value='%%csrf_token%%'>
 <table id=form_area>
 <tr><td>
 %%msg%%
