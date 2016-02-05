@@ -51,13 +51,19 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 	
 	//-----------------------------------------------------
 	
-	String resourceStrReplace(int rid, String needle, String haystack) {
-		return actvt.getRawResourceStr(rid).replace(needle, haystack);
+	String rawResourceStrReplace(int rid, String needle, String haystack) {
+		return rawResourceStr(rid).replace(needle, haystack);
 	}
 	
 	//-----------------------------------------------------
 	
-	String createNewToken() {
+	String rawResourceStr(int rid) {
+		return actvt.getRawResourceStr(rid);
+	}
+	
+	//-----------------------------------------------------
+	
+	String createNewAuthToken() {
 		final SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(actvt);
 		String tok=UUID.randomUUID().toString();
 		Editor editor=prefs.edit();
@@ -105,7 +111,7 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 		if(password_auth && reqMethod.equals("GET")) {
 			String msg="";
 			if(manual_auth) msg="Send an empty password for manual confirmation on device<br>";
-			response.send(resourceStrReplace(R.raw.auth, "%%msg%%", msg));
+			response.send(rawResourceStrReplace(R.raw.auth, "%%msg%%", msg));
 			return false;
 		}
 		
@@ -115,13 +121,13 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 			String password1=vars.getString("password");
 			Log.d("sms_server", password0+"/"+password1);
 			if(password0.equals(password1)) {
-				response.send(addCsrfToken(resourceStrReplace(R.raw.iface, "//%%auth_cookie%%", "Cookies.set('sms_server_auth', '"+createNewToken()+"');"), request));
+				response.send(addCsrfToken(addAuthCookie(rawResourceStr(R.raw.iface)), request));
 				return false;
 			}
 			else if(!manual_auth || !password1.equals("")) {
 					String msg="";
 					if(manual_auth) msg="Send an empty password for manual confirmation on device<br>";
-					response.send(resourceStrReplace(R.raw.auth, "%%msg%%", msg));
+					response.send(rawResourceStrReplace(R.raw.auth, "%%msg%%", msg));
 					return false;
 			}
 		}
@@ -136,9 +142,9 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 						Log.d("sms_server", "yes");
 						authFlag=1;
 						String out;
-						if(path.equals("/")) out=actvt.getRawResourceStr(R.raw.iface);
-						else out=resourceStrReplace(R.raw.ok, "%%host%%", request.getHeaders().get("host"));
-						out=out.replace("//%%auth_cookie%%", "Cookies.set('sms_server_auth', '"+createNewToken()+"');");
+						if(path.equals("/")) out=rawResourceStr(R.raw.iface);
+						else out=rawResourceStrReplace(R.raw.ok, "%%host%%", request.getHeaders().get("host"));
+						out=addAuthCookie(out);
 						if(path.equals("/")) out=addCsrfToken(out, request);
 						response.send(out);
 					break;
@@ -168,11 +174,18 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 	
 	//-----------------------------------------------------
 	
-	String addCsrfToken(String iface, AsyncHttpServerRequest request) {
+	String addCsrfToken(String html, AsyncHttpServerRequest request) {
 		String tok=UUID.randomUUID().toString();
-		iface=iface.replace("//%%csrf_cookie%%", "Cookies.set('sms_server_csrf', '"+tok+"');");
-		iface=iface.replace("%%csrf_token%%", tok);
-		return iface;
+		html=html.replace("//%%csrf_cookie%%", "Cookies.set('sms_server_csrf', '"+tok+"');");
+		html=html.replace("%%csrf_token%%", tok);
+		return html;
+	}
+	
+	//-----------------------------------------------------
+	
+	String addAuthCookie(String html) {
+		html=html.replace("//%%auth_cookie%%", "Cookies.set('sms_server_auth', '"+createNewAuthToken()+"');");
+		return html;
 	}
 	
 	//-----------------------------------------------------
@@ -186,11 +199,11 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 		if(path.equals("/") || path.equals("/action")) if(!auth(request, response)) return;
 	
 		if(path.equals("/"))
-			response.send(addCsrfToken(actvt.getRawResourceStr(R.raw.iface), request));
+			response.send(addCsrfToken(rawResourceStr(R.raw.iface), request));
 		else if(path.equals("/jquery.js"))
-			response.send(actvt.getRawResourceStr(R.raw.jquery));
+			response.send(rawResourceStr(R.raw.jquery));
 		else if(path.equals("/jscookie.js"))
-			response.send(actvt.getRawResourceStr(R.raw.jscookie));
+			response.send(rawResourceStr(R.raw.jscookie));
 		else if(path.equals("/action")) {
 		//===================
 				AsyncHttpRequestBody rb=request.getBody();
@@ -247,7 +260,7 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 					break;
 				}
 			
-				response.send(resourceStrReplace(R.raw.ok, "%%host%%", host));
+				response.send(rawResourceStrReplace(R.raw.ok, "%%host%%", host));
 		//====================
 		}
 		else {
