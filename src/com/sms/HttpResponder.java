@@ -245,7 +245,7 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 	
 		if(path.equals("/"))
 			response.send(addCsrfToken(request, rawResourceStr(R.raw.iface)));
-		if(path.equals("/logout"))
+		else if(path.equals("/logout"))
 			response.send(rawResourceStrReplace(R.raw.logout, "%%host%%", host));
 		else if(path.equals("/jquery.js"))
 			response.send(rawResourceStr(R.raw.jquery));
