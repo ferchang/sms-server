@@ -130,6 +130,12 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 			}
 		}
 
+		if(getRequestCookies(request).indexOf("sms_server_logout")!=-1) {
+			response.send("<script src='jscookie.js'></script><script>Cookies.remove('sms_server_logout');</script>Access denied! (logout)"
+			);
+			return false;
+		}
+		
 		authFlag=-1;
 		
 		final DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
