@@ -63,6 +63,15 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 	
 	//-----------------------------------------------------
 	
+	void showErrorPage(AsyncHttpServerRequest request, AsyncHttpServerResponse response, String msg) {
+		String out=rawResourceStr(R.raw.error);
+		out=out.replace("%%host%%", request.getHeaders().get("host"));
+		out=out.replace("%%msg%%", "Error: "+msg+"!");
+		response.send(out);
+	}
+	
+	//-----------------------------------------------------
+	
 	String createNewAuthToken() {
 		final SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(actvt);
 		String tok=UUID.randomUUID().toString();
@@ -87,7 +96,7 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 		if(!manual_auth && !password_auth) return true;
 		
 		if(!manual_auth && password_auth && password0.equals("")) {
-			response.send("Error: No password is set!");
+			showErrorPage(request, response, "No password is set");
 			return false;
 		}
 		
@@ -102,7 +111,7 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 		else {
 			Log.d("sms_server", "auth not ok");
 			if(path.equals("/action")) {
-				response.send("Access denied!");
+				showErrorPage(request, response, "Access denied");
 				return false;
 			}
 		}
@@ -116,9 +125,9 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 		
 		if(password_auth) {
 			String password1=getPostVar(request, "password");
-			
 			Log.d("sms_server", password0+"/"+password1);
 			if(password0.equals(password1)) {
+				Log.d("sms_server", "password ok");
 				response.send(addCsrfToken(request, addAuthCookie(rawResourceStr(R.raw.iface))));
 				return false;
 			}
@@ -150,7 +159,7 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 					case DialogInterface.BUTTON_NEGATIVE:
 						Log.d("sms_server", "no");
 						authFlag=0;
-						response.send("Access denied!");
+						showErrorPage(request, response, "Access denied");
 					break;
 				}
 			}
@@ -216,12 +225,12 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 		String cookies=getRequestCookies(request);
 		int pos=cookies.indexOf("sms_server_csrf"); 
 		if(pos==-1) {
-			response.send("sms_server_csrf cookie not set!");
+			showErrorPage(request, response, "sms_server_csrf cookie not set");
 			return false;
 		}
 		String tok=cookies.substring(pos+16, pos+16+36);
 		if(tok.equals(getPostVar(request, "csrf_token"))) return true;
-		response.send("csrf token mismatch!");
+		showErrorPage(request, response, "CSRF token mismatch");
 		return false;
 	}
 	
@@ -300,7 +309,7 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 		//====================
 		}
 		else {
-			response.send("unknown path: "+path);
+			showErrorPage(request, response, "Unknown path: "+path);
 			Log.d("sms_server", "unknown path: "+path);
 		}
 	}
