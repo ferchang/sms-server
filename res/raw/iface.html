@@ -43,17 +43,8 @@ select {
 //%%csrf_cookie%%
 </script>
 <script>
-function change_dir(btn) {
-	ta=$('#message_texta');
-	dir=ta.attr('dir');
-	if(dir=='ltr') {
-		ta.attr('dir', 'rtl');
-		$(btn).text('LTR');
-	}
-	else {
-		ta.attr('dir', 'ltr');
-		$(btn).text('RTL')
-	}
+function change_dir(dir) {
+	$('#message_texta').attr('dir', dir);
 }
 
 function loaded() {
@@ -88,7 +79,10 @@ function logout() {
 <tr><td>Number: <input name=number type=text></td></tr>
 <tr><td valign=top>
 <table cellpadding=0 cellspacing=0>
-<tr valign=top align=center><td rowspan=2 style='padding: 0px; padding-top: 5px'>Message:<br><br><button id=dir_btn onclick='change_dir(this); return false;'>RTL</button></td></tr>
+<tr valign=top align=center><td rowspan=2 style='padding: 0px; padding-top: 5px'>Message:<br>
+<span style="vertical-align: middle">LTR:</span> <input type=radio name=text_dir onclick="change_dir('ltr')" checked>
+<br><span style="vertical-align: middle">RTL:</span> <input type=radio name=text_dir onclick="change_dir('rtl')">
+</td></tr>
 <tr valign=top align=center><td><textarea name=message cols=25 rows=5 id=message_texta dir=ltr></textarea></td></tr>
 </table>
 </td></tr>
