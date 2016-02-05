@@ -221,6 +221,7 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 		}
 		String tok=cookies.substring(pos+16, pos+16+36);
 		if(tok.equals(getPostVar(request, "csrf_token"))) return true;
+		response.send("csrf token mismatch!");
 		return false;
 	}
 	
