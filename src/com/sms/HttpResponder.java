@@ -93,10 +93,9 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 		
 		if(manual_auth && password_auth && password0.equals("")) password_auth=false;
 		
-		Headers headers=request.getHeaders();
-		String cookies=headers.get("cookie");
+		String cookies=getRequestCookies(request);
 		Log.d("sms_server", "cookies: "+cookies);
-		if(cookies!=null && !auth_token.equals("") && cookies.indexOf(auth_token)!=-1) {
+		if(!auth_token.equals("") && cookies.indexOf(auth_token)!=-1) {
 			Log.d("sms_server", "auth ok");
 			return true;
 		}
@@ -116,12 +115,11 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 		}
 		
 		if(password_auth) {
-			AsyncHttpRequestBody rb=request.getBody();
-			Multimap vars=(Multimap) rb.get();
-			String password1=vars.getString("password");
+			String password1=getPostVar(request, "password");
+			
 			Log.d("sms_server", password0+"/"+password1);
 			if(password0.equals(password1)) {
-				response.send(addCsrfToken(addAuthCookie(rawResourceStr(R.raw.iface)), request));
+				response.send(addCsrfToken(request, addAuthCookie(rawResourceStr(R.raw.iface))));
 				return false;
 			}
 			else if(!manual_auth || !password1.equals("")) {
@@ -145,7 +143,7 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 						if(path.equals("/")) out=rawResourceStr(R.raw.iface);
 						else out=rawResourceStrReplace(R.raw.ok, "%%host%%", request.getHeaders().get("host"));
 						out=addAuthCookie(out);
-						if(path.equals("/")) out=addCsrfToken(out, request);
+						if(path.equals("/")) out=addCsrfToken(request, out);
 						response.send(out);
 					break;
 					case DialogInterface.BUTTON_NEGATIVE:
@@ -171,12 +169,26 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 		return false;
 		
 	}
+
+	//-----------------------------------------------------
+	
+	String getRequestCookies(AsyncHttpServerRequest request) {
+		String cookies=request.getHeaders().get("cookie");
+		if(cookies!=null) return cookies;
+		return "";
+	}
 	
 	//-----------------------------------------------------
 	
-	String addCsrfToken(String html, AsyncHttpServerRequest request) {
-		String tok=UUID.randomUUID().toString();
-		html=html.replace("//%%csrf_cookie%%", "Cookies.set('sms_server_csrf', '"+tok+"');");
+	String addCsrfToken(AsyncHttpServerRequest request, String html) {
+		String cookies=getRequestCookies(request);
+		int pos=cookies.indexOf("sms_server_csrf"); 
+		String tok;
+		if(pos!=-1) tok=cookies.substring(pos+16, pos+16+36);
+		else {
+			tok=UUID.randomUUID().toString();
+			html=html.replace("//%%csrf_cookie%%", "Cookies.set('sms_server_csrf', '"+tok+"');");
+		}
 		html=html.replace("%%csrf_token%%", tok);
 		return html;
 	}
@@ -185,7 +197,30 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 	
 	String addAuthCookie(String html) {
 		html=html.replace("//%%auth_cookie%%", "Cookies.set('sms_server_auth', '"+createNewAuthToken()+"');");
+		Log.d("sms_server", "addAuthCookie");
 		return html;
+	}
+	
+	//-----------------------------------------------------
+	
+	String getPostVar(AsyncHttpServerRequest request, String name) {
+		AsyncHttpRequestBody rb=request.getBody();
+		Multimap vars=(Multimap) rb.get();
+		return vars.getString(name);
+	}
+	
+	//-----------------------------------------------------
+	
+	boolean checkCsrfToken(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
+		String cookies=getRequestCookies(request);
+		int pos=cookies.indexOf("sms_server_csrf"); 
+		if(pos==-1) {
+			response.send("sms_server_csrf cookie not set!");
+			return false;
+		}
+		String tok=cookies.substring(pos+16, pos+16+36);
+		if(tok.equals(getPostVar(request, "csrf_token"))) return true;
+		return false;
 	}
 	
 	//-----------------------------------------------------
@@ -195,32 +230,31 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 		
 		String path=request.getPath();
 		Log.d("sms_server", path);
+		final String reqMethod=request.getMethod();
+				
+		if(reqMethod.equals("POST")) if(!checkCsrfToken(request, response)) return;
 		
 		if(path.equals("/") || path.equals("/action")) if(!auth(request, response)) return;
 	
 		if(path.equals("/"))
-			response.send(addCsrfToken(rawResourceStr(R.raw.iface), request));
+			response.send(addCsrfToken(request, rawResourceStr(R.raw.iface)));
 		else if(path.equals("/jquery.js"))
 			response.send(rawResourceStr(R.raw.jquery));
 		else if(path.equals("/jscookie.js"))
 			response.send(rawResourceStr(R.raw.jscookie));
 		else if(path.equals("/action")) {
 		//===================
-				AsyncHttpRequestBody rb=request.getBody();
-				Multimap vars=(Multimap) rb.get();
 				
 				String host=request.getHeaders().get("host");
 				
-				Actions action=Actions.valueOf(vars.getString("action").toUpperCase());
+				Actions action=Actions.valueOf(getPostVar(request, "action").toUpperCase());
 			
 				switch(action) {
 					case DIRECT:
 					case DIRECT8SAVE:
 						Log.d("sms_server", "enum direct/direct8save");
-						//SmsManager smsManager = SmsManager.getDefault();
-						//smsManager.sendTextMessage(vars.getString("number"), null, vars.getString("message"), null, null);
 						SmsManager sms = SmsManager.getDefault();
-						ArrayList<String> parts = sms.divideMessage(vars.getString("message"));
+						ArrayList<String> parts = sms.divideMessage(getPostVar(request,"message"));
 						
 						Log.d("sms_server", "==========================");
 						for (int i = 0; i < parts.size(); i++) {
@@ -229,26 +263,26 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 						Log.d("sms_server", "==========================");
 						
 						Log.d("sms_server", "sendMultipartTextMessage>");
-						sms.sendMultipartTextMessage(vars.getString("number"), null, parts, null, null);
+						sms.sendMultipartTextMessage(getPostVar(request,"number"), null, parts, null, null);
 						Log.d("sms_server", "<sendMultipartTextMessage");
 						if(action==Actions.DIRECT8SAVE) {
 							ContentValues values = new ContentValues();
-							values.put("address", vars.getString("number"));
-							values.put("body", vars.getString("message"));
+							values.put("address", getPostVar(request,"number"));
+							values.put("body", getPostVar(request,"message"));
 							actvt.getContentResolver().insert(Uri.parse("content://sms/sent"), values);
 						}
 					break;
 					case BUILTIN:
 						Log.d("sms_server", "enum builtin");
 						Intent sendIntent = new Intent(Intent.ACTION_VIEW);
-						sendIntent.putExtra("sms_body", vars.getString("message")); 
+						sendIntent.putExtra("sms_body", getPostVar(request,"message")); 
 						sendIntent.setType("vnd.android-dir/mms-sms");
-						sendIntent.putExtra("address"  , new String (vars.getString("number")));
+						sendIntent.putExtra("address"  , new String (getPostVar(request,"number")));
 						actvt.startActivity(sendIntent);
 					break;
 					case COPY:
 						Log.d("sms_server", "enum copy");
-						final String fmessage=vars.getString("message");
+						final String fmessage=getPostVar(request,"message");
 						actvt.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
