@@ -42,6 +42,7 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 	HttpResponder(AsyncHttpServer server, final Main actvt) {
 		this.actvt=actvt;
 		server.get("/logout", this);
+		server.get("/clipboard", this);
 		server.get("/", this);
 		server.post("/", this);
 		server.get("/jquery.js", this);
@@ -115,6 +116,11 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 				showErrorPage(request, response, "Access denied");
 				return false;
 			}
+		}
+		
+		if(path.equals("/clipboard")) {
+			response.send("Access denied!");
+			return false;
 		}
 		
 		if(password_auth && reqMethod.equals("GET")) {
@@ -232,7 +238,7 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 	//-----------------------------------------------------
 	
 	@Override
-	public void onRequest(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
+	public void onRequest(AsyncHttpServerRequest request, final AsyncHttpServerResponse response) {
 		
 		String path=request.getPath();
 		Log.d("sms_server", path);
@@ -241,10 +247,26 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 				
 		if(reqMethod.equals("POST")) if(!checkCsrfToken(request, response)) return;
 		
-		if(path.equals("/") || path.equals("/action")) if(!auth(request, response)) return;
+		if(path.equals("/") || path.equals("/action") || path.equals("/clipboard"))
+			if(!auth(request, response)) return;
 	
 		if(path.equals("/"))
 			response.send(addCsrfToken(request, rawResourceStr(R.raw.iface)));
+		else if(path.equals("/clipboard")) {
+			actvt.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					ClipboardManager clipboard = (ClipboardManager) actvt.getSystemService(Context.CLIPBOARD_SERVICE);
+					ClipData clip = clipboard.getPrimaryClip();
+					if(clip!=null) {
+						ClipData.Item item = clip.getItemAt(0);
+						String text= item.getText().toString();
+						response.send(text);
+					}
+					else response.send("");
+				}
+			});
+		}
 		else if(path.equals("/logout"))
 			response.send(rawResourceStrReplace(R.raw.logout, "%%host%%", host));
 		else if(path.equals("/jquery.js"))
