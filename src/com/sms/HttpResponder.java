@@ -261,9 +261,13 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 					if(clip!=null) {
 						ClipData.Item item = clip.getItemAt(0);
 						String text= item.getText().toString();
+						Log.d("sms_server", "clipboard: "+text);
 						response.send(text);
 					}
-					else response.send("");
+					else {
+						Log.d("sms_server", "clipboard empty");
+						response.send("");
+					}
 				}
 			});
 		}
