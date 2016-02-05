@@ -41,6 +41,7 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 	
 	HttpResponder(AsyncHttpServer server, final Main actvt) {
 		this.actvt=actvt;
+		server.get("/logout", this);
 		server.get("/", this);
 		server.post("/", this);
 		server.get("/jquery.js", this);
@@ -137,12 +138,6 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 					response.send(addCsrfToken(request, rawResourceStrReplace(R.raw.auth, "%%msg%%", msg)));
 					return false;
 			}
-		}
-
-		if(getRequestCookies(request).indexOf("sms_server_logout")!=-1) {
-			response.send("<script src='jscookie.js'></script><script>Cookies.remove('sms_server_logout');</script>Access denied! (logout)"
-			);
-			return false;
 		}
 		
 		authFlag=-1;
@@ -242,6 +237,7 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 		String path=request.getPath();
 		Log.d("sms_server", path);
 		final String reqMethod=request.getMethod();
+		String host=request.getHeaders().get("host");
 				
 		if(reqMethod.equals("POST")) if(!checkCsrfToken(request, response)) return;
 		
@@ -249,15 +245,14 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 	
 		if(path.equals("/"))
 			response.send(addCsrfToken(request, rawResourceStr(R.raw.iface)));
+		if(path.equals("/logout"))
+			response.send(rawResourceStrReplace(R.raw.logout, "%%host%%", host));
 		else if(path.equals("/jquery.js"))
 			response.send(rawResourceStr(R.raw.jquery));
 		else if(path.equals("/jscookie.js"))
 			response.send(rawResourceStr(R.raw.jscookie));
 		else if(path.equals("/action")) {
-		//===================
-				
-				String host=request.getHeaders().get("host");
-				
+		//===============================================================================
 				Actions action=Actions.valueOf(getPostVar(request, "action").toUpperCase());
 			
 				switch(action) {
@@ -306,7 +301,7 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 				}
 			
 				response.send(rawResourceStrReplace(R.raw.ok, "%%host%%", host));
-		//====================
+		//===============================================================================
 		}
 		else {
 			showErrorPage(request, response, "Unknown path: "+path);

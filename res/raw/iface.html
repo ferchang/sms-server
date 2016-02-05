@@ -57,7 +57,6 @@ function change_dir(btn) {
 }
 
 function loaded() {
-	Cookies.remove('sms_server_logout');
 	$('#dir_btn').css('visibility', 'visible');
 	if(Cookies.get('sms_server_action')) $('#action_select').val(Cookies.get('sms_server_action'));
 	if(!Cookies.get('sms_server_auth')) $('#logout_link').hide();
@@ -73,8 +72,7 @@ function form_submit() {
 
 function logout() {
 	Cookies.remove('sms_server_auth');
-	Cookies.set('sms_server_logout', '1');
-	location.assign(location.href);
+	location.href='logout';
 }
 
 //------------------------------------
