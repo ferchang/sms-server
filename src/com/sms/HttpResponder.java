@@ -139,12 +139,7 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 					case DialogInterface.BUTTON_POSITIVE:
 						Log.d("sms_server", "yes");
 						authFlag=1;
-						String out;
-						if(path.equals("/")) out=rawResourceStr(R.raw.iface);
-						else out=rawResourceStrReplace(R.raw.ok, "%%host%%", request.getHeaders().get("host"));
-						out=addAuthCookie(out);
-						if(path.equals("/")) out=addCsrfToken(request, out);
-						response.send(out);
+						response.send(addCsrfToken(request, addAuthCookie(rawResourceStr(R.raw.iface))));
 					break;
 					case DialogInterface.BUTTON_NEGATIVE:
 						Log.d("sms_server", "no");
