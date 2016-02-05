@@ -85,6 +85,14 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 	
 	//-----------------------------------------------------
 	
+	void showAuthPage(AsyncHttpServerRequest request, AsyncHttpServerResponse response, boolean manual_auth) {
+		String msg="";
+		if(manual_auth) msg="Send an empty password for manual confirmation on device<br>";
+		response.send(addCsrfToken(request, rawResourceStrReplace(R.raw.auth, "%%msg%%", msg)));
+	}
+	
+	//-----------------------------------------------------
+	
 	private boolean auth(final AsyncHttpServerRequest request, final AsyncHttpServerResponse response) {
 		
 		final String path=request.getPath();
@@ -124,9 +132,7 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 		}
 		
 		if(password_auth && reqMethod.equals("GET")) {
-			String msg="";
-			if(manual_auth) msg="Send an empty password for manual confirmation on device<br>";
-			response.send(addCsrfToken(request, rawResourceStrReplace(R.raw.auth, "%%msg%%", msg)));
+			showAuthPage(request, response, manual_auth);
 			return false;
 		}
 		
@@ -138,11 +144,11 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 				response.send(addCsrfToken(request, addAuthCookie(rawResourceStr(R.raw.iface))));
 				return false;
 			}
-			else if(!manual_auth || !password1.equals("")) {
-					String msg="";
-					if(manual_auth) msg="Send an empty password for manual confirmation on device<br>";
-					response.send(addCsrfToken(request, rawResourceStrReplace(R.raw.auth, "%%msg%%", msg)));
+			else {
+				if(!manual_auth || !password1.equals("")) {
+					showAuthPage(request, response, manual_auth);
 					return false;
+				}
 			}
 		}
 		
