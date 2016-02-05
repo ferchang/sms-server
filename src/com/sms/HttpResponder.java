@@ -115,7 +115,7 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 			String password1=vars.getString("password");
 			Log.d("sms_server", password0+"/"+password1);
 			if(password0.equals(password1)) {
-				response.send(resourceStrReplace(R.raw.iface, "//%%auth%%", "Cookies.set('sms_server_auth', '"+createNewToken()+"');"));
+				response.send(addCsrfToken(resourceStrReplace(R.raw.iface, "//%%auth_cookie%%", "Cookies.set('sms_server_auth', '"+createNewToken()+"');"), request));
 				return false;
 			}
 			else if(!manual_auth || !password1.equals("")) {
@@ -138,7 +138,8 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 						String out;
 						if(path.equals("/")) out=actvt.getRawResourceStr(R.raw.iface);
 						else out=resourceStrReplace(R.raw.ok, "%%host%%", request.getHeaders().get("host"));
-						out=out.replace("//%%auth%%", "Cookies.set('sms_server_auth', '"+createNewToken()+"');");
+						out=out.replace("//%%auth_cookie%%", "Cookies.set('sms_server_auth', '"+createNewToken()+"');");
+						if(path.equals("/")) out=addCsrfToken(out, request);
 						response.send(out);
 					break;
 					case DialogInterface.BUTTON_NEGATIVE:
@@ -167,6 +168,15 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 	
 	//-----------------------------------------------------
 	
+	String addCsrfToken(String iface, AsyncHttpServerRequest request) {
+		String tok=UUID.randomUUID().toString();
+		iface=iface.replace("//%%csrf_cookie%%", "Cookies.set('sms_server_csrf', '"+tok+"');");
+		iface=iface.replace("%%csrf_token%%", tok);
+		return iface;
+	}
+	
+	//-----------------------------------------------------
+	
 	@Override
 	public void onRequest(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
 		
@@ -176,7 +186,7 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 		if(path.equals("/") || path.equals("/action")) if(!auth(request, response)) return;
 	
 		if(path.equals("/"))
-			response.send(actvt.getRawResourceStr(R.raw.iface));
+			response.send(addCsrfToken(actvt.getRawResourceStr(R.raw.iface), request));
 		else if(path.equals("/jquery.js"))
 			response.send(actvt.getRawResourceStr(R.raw.jquery));
 		else if(path.equals("/jscookie.js"))
