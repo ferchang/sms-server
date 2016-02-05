@@ -85,10 +85,13 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 	
 	//-----------------------------------------------------
 	
-	void showAuthPage(AsyncHttpServerRequest request, AsyncHttpServerResponse response, boolean manual_auth) {
+	void showAuthPage(AsyncHttpServerRequest request, AsyncHttpServerResponse response, boolean manual_auth, String password1) {
+		String out=addCsrfToken(request, rawResourceStr(R.raw.auth));
+		if(!password1.equals("")) out=out.replace("<!-- %%error_msg%% -->", "<h4 style='color: red; background: yellow; display: inline; padding: 5px'>Password was wrong!</h4><br><br>");
 		String msg="";
 		if(manual_auth) msg="Send an empty password for manual confirmation on device<br>";
-		response.send(addCsrfToken(request, rawResourceStrReplace(R.raw.auth, "%%msg%%", msg)));
+		out=out.replace("%%msg%%", msg);
+		response.send(out);
 	}
 	
 	//-----------------------------------------------------
@@ -132,7 +135,7 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 		}
 		
 		if(password_auth && reqMethod.equals("GET")) {
-			showAuthPage(request, response, manual_auth);
+			showAuthPage(request, response, manual_auth, "");
 			return false;
 		}
 		
@@ -146,7 +149,7 @@ class HttpResponder implements HttpServerRequestCallback, CompletedCallback {
 			}
 			else {
 				if(!manual_auth || !password1.equals("")) {
-					showAuthPage(request, response, manual_auth);
+					showAuthPage(request, response, manual_auth, password1);
 					return false;
 				}
 			}
