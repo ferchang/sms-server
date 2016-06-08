@@ -1,0 +1,31 @@
+<html>
+<head>
+//title//
+<style>
+td {
+	padding: 5pt;
+}
+body {
+	background: rgb(71,150,207);
+}
+#msg_area {
+	background: rgb(183,181,96);
+	border: medium solid green;	
+}
+h3, h4 {
+	margin: 0px;
+}
+</style>
+<script>
+</script>
+</head>
+<body onload='document.dir=dir'>
+%%js_off_msg%%
+<table width='100%' height='100%' id=outer_table><tr><td align=center valign=center>
+<table id=msg_area><tr align=center valign=center><td>
+<h3 style='color: red; background: #350; padding: 5px;'>%%msg%%</h3>
+<br><h4><a href='http://%%host%%'>//go2main//</a></h4>
+</td></tr></table>
+</td></tr></table>
+</body>
+</html>

@@ -1,5 +1,13 @@
-package com.sms;
-//
+package hmz2627_at_gmail_dot_com.sms_server;
+
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
+
+import java.util.Locale;
+import android.content.res.Configuration;
+import android.content.res.Resources;
+
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,6 +41,8 @@ public class Main extends Activity {
 	
 	private String serverFlag="x";
 	
+	private String lang;
+	
 	private final int DEFAULT_PORT=8888;
 	
 	private static final int MENU_OPTIONS = Menu.FIRST;
@@ -41,26 +51,44 @@ public class Main extends Activity {
 	private AsyncHttpServer server = new AsyncHttpServer();
     private AsyncServer mAsyncServer = new AsyncServer();
 	
+	public void ipsBtnClick(View view) {
+		Intent intent = new Intent(getApplicationContext(), IPs.class);
+		startActivity(intent);
+	}
+	
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+		
+		PreferenceManager.setDefaultValues(this, R.xml.prefs, false);
+		
+		Prefs.p=PreferenceManager.getDefaultSharedPreferences(this);
+		
+		Logger.d("---------------------------------");
+		Logger.d("create");
+		
+		Logger.d("OS Locale: "+Resources.getSystem().getConfiguration().locale);
+		
+		String lang=Prefs.p.getString("lang", "default");
+		Logger.d("lang: "+lang);
+		if(!lang.equals("default")) MyLocale.changeLocale(this, lang);
+		
+		this.lang=lang;
+		
         setContentView(R.layout.main);
-		Log.d("sms_server", "---------------------------------");
-		Log.d("sms_server", "create");
-		PreferenceManager.setDefaultValues(this, R.xml.prefs, false);		
     }
 	
 	@Override
     public void onStart() {
         super.onStart();
-		Log.d("sms_server", "start");
+		Logger.d("start");
     }
 	
 	//----------------------------------------
 	@Override
 	public Object onRetainNonConfigurationInstance() {
-		Log.d("sms_server", "onRetainNonConfigurationInstance");
+		Logger.d("onRetainNonConfigurationInstance");
 		return new Object();
 	}
 	//----------------------------------------
@@ -68,23 +96,23 @@ public class Main extends Activity {
 	@Override
     public void onResume() {
         super.onResume();
-		Log.d("sms_server", "resume");
-		SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(this);
-		String tmp=prefs.getString("port", "");
+		Current.currentActivity=this;
+		Logger.d("resume");
+		Prefs.p.getString("lang", "x");
+		String tmp=Prefs.p.getString("port", "");
 		//------------------------
 		if(serverFlag.equals(tmp)) return;
 		//------------------------
 		if(tmp.equals("")) {
 			port=DEFAULT_PORT;
-			Editor editor = prefs.edit();
+			Editor editor = Prefs.p.edit();
 			editor.putString("port", Integer.toString(port));
 			editor.commit();
 		}
 		else port=Integer.parseInt(tmp);
-		Log.d("sms_server", "port: "+Integer.toString(port));
-        startServer();
+		Logger.d("port: "+Integer.toString(port));
 		TextView portLbl = (TextView) findViewById(R.id.port);
-		portLbl.setText("Port: "+port);
+		portLbl.setText(getResources().getString(R.string.port)+": "+startServer());
 		serverFlag=Integer.toString(port);
 		
     }
@@ -92,13 +120,13 @@ public class Main extends Activity {
 	@Override
    protected void onPause() {
       super.onPause();
-      Log.d("sms_server", "pause");
+      Logger.d("pause");
    }
    
    @Override
    protected void onStop() {
       super.onStop();
-      Log.d("sms_server", "stop");
+      Logger.d("stop");
    }
 
 	 @Override
@@ -106,16 +134,22 @@ public class Main extends Activity {
 	   server.stop();
 	   mAsyncServer.stop();
       super.onDestroy();
-      Log.d("sms_server", "destroy");
+      Logger.d("destroy");
    }
    
    @Override
    protected void onRestart() {
-      super.onRestart();
-      Log.d("sms_server", "restart");
+		super.onRestart();
+		Logger.d("restart");
+		String lang=Prefs.p.getString("lang", "default");
+		if(!lang.equals(this.lang)) {
+			Logger.d("calling recreate...");
+			MyLocale.changeLocale(this, lang);
+			recreate();	  
+		}
    }
    
-	 private void startServer() {
+	 private int startServer() {
 	
 		new HttpResponder(server, this);
 		
@@ -123,13 +157,17 @@ public class Main extends Activity {
 		mAsyncServer.stop();
 		
 		AsyncServerSocket tmp=server.listen(mAsyncServer, port);
+		
 		if(tmp==null) {
-			Log.d("sms_server", "server start failed");
+			Logger.d("server start failed");
 			findViewById(R.id.status_view).setBackgroundResource(R.drawable.server_off_lamp);
+			return -1;
 		}
 		else {
-			Log.d("sms_server", "server started");
+			Logger.d("server started");
+			Logger.d("Local port: "+Integer.toString(tmp.getLocalPort()));
 			findViewById(R.id.status_view).setBackgroundResource(R.drawable.server_on_lamp);
+			return tmp.getLocalPort();
 		}
         
     }
@@ -147,8 +185,8 @@ public class Main extends Activity {
 	
 	//------------------------------
 	public boolean onCreateOptionsMenu(Menu menu) {
-		menu.add(Menu.NONE, MENU_OPTIONS, Menu.NONE, "Options");
-		menu.add(Menu.NONE, MENU_ABOUT, Menu.NONE, "About");
+		menu.add(Menu.NONE, MENU_OPTIONS, Menu.NONE, R.string.options);
+		menu.add(Menu.NONE, MENU_ABOUT, Menu.NONE, R.string.about);
 		return(super.onCreateOptionsMenu(menu));
 	}
 	
@@ -156,7 +194,7 @@ public class Main extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case MENU_OPTIONS:
-				startActivity(new Intent(this, Prefs.class));
+				startActivity(new Intent(this, Preferences.class));
 			break;
 			case MENU_ABOUT:
 				startActivity(new Intent(this, About.class));

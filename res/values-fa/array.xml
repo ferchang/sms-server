@@ -1,0 +1,7 @@
+<resources>
+<string-array name="listArray">
+	<item>&#160;پیشفرض دستگاه</item>
+	<item>&#160;انگلیسی</item>
+	<item>&#160;فارسی</item>
+</string-array>
+</resources>

@@ -1,0 +1,12 @@
+<resources>
+<string-array name="listArray">
+	<item>Device default</item>
+	<item>English</item>
+	<item>Persian</item>
+</string-array>
+<string-array name="listValues">
+    <item>default</item>
+    <item>en_US</item>
+    <item>fa_IR</item>
+</string-array>
+</resources>

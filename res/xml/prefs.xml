@@ -1,22 +1,30 @@
 <PreferenceScreen
-xmlns:android="http://schemas.android.com/apk/res/android">
+xmlns:android="http://schemas.android.com/apk/res/android"
+android:title="@string/options"
+>
+
+	<ListPreference android:title="@string/language"
+                      android:key="lang"
+                      android:defaultValue="default"
+                      android:entries="@array/listArray"
+                      android:entryValues="@array/listValues" />
 
    <EditTextPreference 
     android:key="port" 
-    android:title="Port number"
+    android:title="@string/port_number"
 	android:inputType="numberDecimal"
     />    
 
-	<PreferenceCategory android:title="Auth">
+	<PreferenceCategory android:title="@string/auth">
 
-	<PreferenceScreen android:title="Auth method">
+	<PreferenceScreen android:title="@string/auth_method">
 	
 	<CheckBoxPreference
-    android:title="Password"
+    android:title="@string/password"
     android:key="password_auth" />
 		  
 	<CheckBoxPreference
-    android:title="Manual"
+    android:title="@string/manual_confirmation"
     android:key="manual_auth"
 	android:defaultValue="true"
 	/>
@@ -25,11 +33,23 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 	
 	<EditTextPreference 
     android:key="password" 
-    android:title="Password"
+    android:title="@string/password"
 	android:inputType=""
     />
 
 	
 	</PreferenceCategory>
 	
+	<!-- -->
+	
+	<PreferenceCategory android:title="@string/dev">
+
+	<CheckBoxPreference
+    android:title="@string/debug"
+    android:key="debug" />
+
+	</PreferenceCategory>
+	
+	<!-- -->
+
 </PreferenceScreen>

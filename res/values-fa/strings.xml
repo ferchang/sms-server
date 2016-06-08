@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">سرور پیامک</string>
+	<string name="port_q">پورت: ؟</string>
+	<string name="options">تنظیمات</string>
+	<string name="about">درباره</string>
+	<string name="program_by">نوشته شده توسط:</string>
+	<string name="port_number">شماره پورت</string>
+	<string name="auth">احراز هویت</string>
+	<string name="auth_method">روش احراز هویت</string>
+	<string name="password">کلمه عبور</string>
+	<string name="manual_confirmation">تایید دستی</string>
+	<string name="port">پورت</string>
+	<string name="language">زبان</string>
+	<string name="password_wrong">کلمه عبور اشتباه بود!</string>
+	<string name="manual_possible">برای تایید دستی روی دستگاه، کلمه عبور خالی ارسال کنید</string>
+	<string name="access_denied">دسترسی رد شد</string>
+	<string name="error">خطا</string>
+	<string name="no_password">کلمه عبور تعیین نشده است</string>
+	<string name="message_processed">پیام توسط سرور پیامک دریافت و پردازش شد.</string>
+	<string name="accept_conn">پذیرش اتصال؟</string>
+	<string name="yes">بله</string>
+	<string name="no">خیر</string>
+	<string name="dev">توسعه دهنده</string>
+	<string name="debug">ذخیره پیامهای عیب یابی</string>
+	<string name="RESULT_OK">موفق</string>
+	<string name="RESULT_CANCELED">لغو شده</string>
+	<string name="RESULT_ERROR_GENERIC_FAILURE">خطای عمومی</string>
+	<string name="RESULT_ERROR_NO_SERVICE">خطا: عدم سرویس</string>
+	<string name="RESULT_ERROR_NULL_PDU">خطا: NULL PDU</string>
+	<string name="RESULT_ERROR_RADIO_OFF">خطا: RADIO OFF</string>
+	<string name="js_off_msg">خطا: جاوااسکریپت مرورگر شما غیرفعال است!&#8207;</string>
+	<string name="IPs">لیست IP های دستگاه</string>
+	<string name="ips_btn_text">&#8207;IP های دستگاه</string>
+	<string name="no_ifaces">هیچ رابط شبکه ای پیدا نشد!</string>
+</resources>

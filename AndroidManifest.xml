@@ -1,16 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="com.sms"
-      android:versionCode="1"
-      android:versionName="1.0">
+      package="hmz2627_at_gmail_dot_com.sms_server"
+      android:versionCode="2"
+      android:versionName="1.001">
+
 <uses-permission android:name="android.permission.INTERNET"></uses-permission>
 <uses-permission android:name="android.permission.SEND_SMS"></uses-permission>
 <uses-permission android:name="android.permission.READ_SMS"/>
- <uses-permission android:name="android.permission.WRITE_SMS"/>
-	  
+<uses-permission android:name="android.permission.WRITE_SMS"/>
+
+<uses-sdk android:minSdkVersion="16" />
+
     <application android:label="@string/app_name" android:icon="@drawable/ic_launcher">
         <activity android:name="Main"
-                  android:label="@string/app_name">
+                  android:label="@string/app_name"
+				  android:configChanges="locale"
+				  >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -18,11 +23,16 @@
         </activity>
 		
 		<activity android:name="About"
-		android:label="About">
+		android:label="@string/about">
 		</activity>
 		
-		<activity android:name="Prefs"
-		android:label="Options">
+		<activity android:name="Preferences"
+		android:label="@string/options">
 		</activity>
+		
+		<activity android:name="IPs"
+		android:label="@string/IPs">
+		</activity>
+		
     </application>
 </manifest>

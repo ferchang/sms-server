@@ -1,0 +1,16 @@
+title='<title>رابط سرور پیامک</title>';
+sms_server_iface='رابط سرور پیامک';
+number='شماره';
+message='پیام';
+paste='الصاق';
+directly='ارسال مستقیم پیام';
+directly8save='ارسال مستقیم و ذخیره کردن پیام';
+builtin='ارسال به برنامه پیامک خود دستگاه';
+copy='کپی در کلیپ‌بورد دستگاه';
+submit_btn='<input type=submit value="ارسال" id=submit_btn>';
+_logout='خروج';
+fields_empty_error='فیلدهای شماره و پیام نباید خالی باشند!';
+pasted_str='الصاق شد';
+empty_str='خالی';
+error_str='خطا';
+paste_btn_title='الصاق از کلیپ‌بورد دستگاه';

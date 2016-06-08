@@ -1,0 +1,16 @@
+title='<title>SMS server interface</title>';
+sms_server_iface='SMS server interface';
+number='Number';
+message='Message';
+paste='Paste';
+directly='Send message directly';
+directly8save='Send message directly and save it';
+builtin='Send to device built-in SMS app';
+copy='Just copy message to device clipboard';
+submit_btn='<input type=submit value=Send id=submit_btn>';
+_logout='Logout';
+fields_empty_error='Number and message fields must not be empty!';
+pasted_str='Pasted';
+empty_str='Empty';
+error_str='Error';
+paste_btn_title='Paste device clipboard';

@@ -1,4 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">sms server</string>
+    <string name="app_name">SMS server</string>
+	<string name="port_q">Port: ?</string>
+	<string name="options">Options</string>
+	<string name="about">About</string>
+	<string name="program_by">Program by:</string>
+	<string name="myemail">hmz2627 -=At=- gmail.com</string>
+	<string name="port_number">Port number</string>
+	<string name="auth">Auth</string>
+	<string name="auth_method">Auth method</string>
+	<string name="password">Password</string>
+	<string name="manual_confirmation">Manual confirmation</string>
+	<string name="port">Port</string>
+	<string name="language">Language</string>
+	<string name="password_wrong">Password was wrong!</string>
+	<string name="manual_possible">Send an empty password for manual confirmation on device</string>
+	<string name="access_denied">Access denied</string>
+	<string name="error">Error</string>
+	<string name="no_password">No password is set</string>
+	<string name="message_processed">Message received and processed by SMS server.</string>
+	<string name="accept_conn">Accept connection?</string>
+	<string name="yes">Yes</string>
+	<string name="no">No</string>
+	<string name="dev">Developer</string>
+	<string name="debug">Log debug messages</string>
+	<string name="RESULT_OK">Successful</string>
+	<string name="RESULT_CANCELED">Cancelled</string>
+	<string name="RESULT_ERROR_GENERIC_FAILURE">ERROR: GENERIC FAILURE</string>
+	<string name="RESULT_ERROR_NO_SERVICE">ERROR: NO SERVICE</string>
+	<string name="RESULT_ERROR_NULL_PDU">ERROR: NULL PDU</string>
+	<string name="RESULT_ERROR_RADIO_OFF">ERROR: RADIO OFF</string>
+	<string name="js_off_msg">Error: Javascript is disabled in your browser!</string>
+	<string name="IPs">List of device IP\'s</string>
+	<string name="ips_btn_text">Device IP\'s</string>
+	<string name="no_ifaces">No network interfaces!</string>
 </resources>

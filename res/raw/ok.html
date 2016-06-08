@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>SMS server - ok</title>
+//title//
 <style>
 td {
 	padding: 5pt;
@@ -15,17 +15,119 @@ body {
 h3, h4 {
 	margin: 0px;
 }
+#status_table {
+	border: medium solid green;
+	padding: 5px;
+	display: none;
+	width: 100%;
+}
+#counter {
+	text-align: center;
+}
+#status_lamp {
+	border: thin solid #000;
+	background: #fff;
+	height: 10px;
+	width: 10px;
+	display: inline-block;
+	padding: 1px;
+}
 </style>
-<script src='jscookie.js'></script>
 <script>
-//%%auth%%
+
+status_check_intervals=[3, 5, 5, 10, 10, 15];
+index=0;
+
+//%%req_code%%;
+
+function onload() {
+
+	document.dir=dir;
+
+	if(req_code!=-1) {
+		$("#status_table").show();
+		start_check_interval(status_check_intervals[index]);
+	}
+}
+
+function start_check_interval(secs) {
+	setTimeout("check_status()", secs*1000);
+	clearTimeout(tt);
+	count(secs);
+}
+
+c=0;
+tt=setTimeout("c=0", 1);
+
+function count(secs) {
+	if(secs!=-1) c=secs;
+	else if(c>0) c--;
+	else {
+		clearTimeout(tt);
+		return;
+	}
+	$('#counter').text(c);
+	tt=setTimeout("count(-1)", 1000);
+}
+
+sendStatusFlag=false;
+deliverStatusFlag=false;
+
+function check_status() {
+
+	if(sendStatusFlag && deliverStatusFlag) {
+		//clearTimeout(tt);
+		$('#counter_pan').hide();
+		return;
+	}
+
+	$.get("report?req_code="+req_code, function(data) {
+		$('#status_lamp').css('background', 'green');
+		obj=$.parseJSON(data);
+		if(obj.send!=null) {
+			$("#send_status").text(obj.send);
+			sendStatusFlag=true;
+		}
+		if(obj.deliver!=null) {
+			$("#deliver_status").text(obj.deliver);
+			deliverStatusFlag=true;
+		}
+		if(sendStatusFlag && deliverStatusFlag) {
+			//clearTimeout(tt);
+			$('#counter_pan').hide();
+			return;
+		}
+		else start_check_interval(status_check_intervals[index]);
+	}
+	).fail(function() {
+		$('#status_lamp').css('background', 'red');
+		start_check_interval(status_check_intervals[index]);
+	}
+	);
+	
+	$('#status_lamp').css('background', 'blue');
+
+	if(index<status_check_intervals.length-1) index++;
+
+}
+
 </script>
 </head>
-<body>
+<body onload='onload();'>
+%%js_off_msg%%
 <table width='100%' height='100%' id=outer_table><tr><td align=center valign=center>
 <table id=msg_area><tr align=center valign=center><td>
-<h3>Message received and processed by SMS server.</h3>
-<br><h4><a href='http://%%host%%'>Go to main page</a></h4>
+<h3>%%message_processed%%</h3>
+<br>
+<table id=status_table ><tr>
+<td valign=center>
+//send_status//: <span id=send_status>//waiting//</span><br>
+//delivery_status//: <span id=deliver_status>//waiting//</span>
+</td>
+<td align=center valign=center style="width: 20%"><div id=counter_pan><span id=counter>0</span><br><span id=status_lamp>&nbsp;</span></td>
+</tr></table>
+
+<br><h4><a href='http://%%host%%'>//go2main//</a></h4>
 </td></tr></table>
 </td></tr></table>
 </body>

@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>SMS server interface</title>
+//title//
 <style>
 td {
 	padding: 5pt;
@@ -36,72 +36,94 @@ select {
 
 }
 </style>
-<script src='jscookie.js'></script>
-<script src='jquery.js'></script>
 <script>
-//%%auth%%
+//%%auth_cookie%%
+//%%csrf_cookie%%
 </script>
 <script>
-function change_dir(btn) {
-	ta=$('#message_texta');
-	dir=ta.attr('dir');
-	if(dir=='ltr') {
-		ta.attr('dir', 'rtl');
-		$(btn).text('LTR');
-	}
-	else {
-		ta.attr('dir', 'ltr');
-		$(btn).text('RTL')
-	}
+function change_dir(dir) {
+	$('#message_texta').attr('dir', dir);
 }
 
 function loaded() {
 	$('#dir_btn').css('visibility', 'visible');
 	if(Cookies.get('sms_server_action')) $('#action_select').val(Cookies.get('sms_server_action'));
 	if(!Cookies.get('sms_server_auth')) $('#logout_link').hide();
+	if(dir=='ltr') $("#ltr_radio").click();
+	else $("#rtl_radio").click();
+	$('#paste_btn').attr('title', paste_btn_title);
 }
 
 //------------------------------------
 
 function form_submit() {
 	Cookies.set('sms_server_action', $('#action_select').val());
+	if($("#action_select").val()!='direct' && $("#action_select").val()!='direct8save') return true;
+	if($('body').find('input[name="number"]').val()!='' && $('#message_texta').val()!='') return true;
+	alert(fields_empty_error);
+	return false;
 }
 
 //------------------------------------
 
 function logout() {
 	Cookies.remove('sms_server_auth');
-	location.assign(location.href);
+	location.href='logout';
+}
+
+//------------------------------------
+
+function device_clipboard() {
+	$.get("clipboard", function(data) {
+		if(data=="") $('#paste_btn').text(empty_str).css('color', '#00f');
+		else {
+			$('#message_texta').val($('#message_texta').val()+data);
+			$('#paste_btn').css('color', 'green');
+		}
+		setTimeout("$('#paste_btn').text(paste).css('color', '#000')", 1000);
+	}
+	).fail(function() {
+		$('#paste_btn').text(error_str+'!').css('color', 'red');
+		setTimeout("$('#paste_btn').text(paste).css('color', '#000');", 1000);
+	}
+	);
+	return false;
 }
 
 //------------------------------------
 
 </script>
 </head>
-<body onload='loaded()'>
+<body onload='loaded(); document.dir=dir'>
+%%js_off_msg%%
 <table width='100%' height='100%' id=outer_table><tr><td align=center valign=center>
-<h3 align=center>SMS server interface</h3>
-<form action='action' method=post onsubmit='form_submit()'>
+<h3 align=center>//sms_server_iface//</h3>
+<form action='action' method=post onsubmit='return form_submit()'>
+<input type=hidden name=csrf_token value='%%csrf_token%%'>
 <table id=form_area>
-<tr><td>Number: <input name=number type=text></td></tr>
+<tr><td>//number//: <input name=number type=text></td></tr>
 <tr><td valign=top>
 <table cellpadding=0 cellspacing=0>
-<tr valign=top align=center><td rowspan=2 style='padding: 0px; padding-top: 5px'>Message:<br><br><button id=dir_btn onclick='change_dir(this); return false;'>RTL</button></td></tr>
+<tr valign=top align=center><td rowspan=2 style='padding: 0px; padding-top: 5px'>//message//: <br>
+<span style="vertical-align: middle">LTR:</span> <input type=radio name=text_dir onclick="change_dir('ltr')" id=ltr_radio>
+<br><span style="vertical-align: middle">RTL:</span> <input type=radio name=text_dir onclick="change_dir('rtl')" id=rtl_radio>
+<br><button style='margin-top: 10px' onclick='return device_clipboard();' title='Paste device clipboard' id=paste_btn>//paste//</button>
+</td></tr>
 <tr valign=top align=center><td><textarea name=message cols=25 rows=5 id=message_texta dir=ltr></textarea></td></tr>
 </table>
 </td></tr>
 <tr><td align=center>
 <select name=action id=action_select>
-<option value=direct>Send message directly
-<option value=direct8save>Send message directly and save it
-<option value=builtin>Send to device built-in SMS app
-<option value=copy>Just copy message to device clipboard
+<option value=direct>//directly//
+<option value=direct8save>//directly8save//
+<option value=builtin>//builtin//
+<option value=copy>//copy//
 </select>
-<input type=submit value=Send id=submit_btn>
+//submit_btn//
 </td></tr>
 </table>
 </form>
-<a href='javascript:logout();' style='color: #fff;' id=logout_link>Logout</a>
+<a href='javascript:logout();' style='color: #fff;' id=logout_link>//_logout//</a>
 </td></tr></table>
 </body>
 </html>
